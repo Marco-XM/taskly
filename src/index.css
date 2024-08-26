@@ -1,0 +1,120 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sora: "Sora", sans-serif;
+  --font-code: "Source Code Pro", monospace;
+  --font-grotesk: "Space Grotesk", sans-serif;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  body {
+    @apply font-sans bg-n-8 text-n-1 text-base;
+  }
+}
+
+.menu-container{
+  position: relative;
+  width: 10%;
+  cursor: pointer;
+}
+
+.menu-container:hover .menu-span:nth-child(2){
+  width: 62%;
+}
+
+.menu-span:nth-child(2) {
+  width: 0%;
+}
+
+.TaskList-Hovering:hover .div .span {
+  filter: drop-shadow(-10px 28px 22px #000000);
+}
+
+
+.dragging {
+  opacity: 0.5;
+  border: 2px dashed #ccc;
+}
+
+.transition-element-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+.transition-element-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
+.transition-element-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+.transition-element-exit-active {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 300ms, transform 300ms;
+}
+
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 1px 1px rgb(146, 146, 146);
+  border: solid 5px transparent;
+  
+}
+
+::-webkit-scrollbar-thumb {
+  box-shadow: inset 0 0 10px 10px rgb(197, 197, 197);
+  border: solid 3px transparent;
+  border-radius: 10px;
+}
+
+.add-task-button {
+  background-color: var(--box-color);
+  transition: box-shadow 0.3s ease;
+}
+
+.add-task-button:hover {
+  box-shadow: 0px 8px 20px 0px var(--box-color);
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.workspace {
+  width: 200%;
+  height: 200%;
+  background-color: #f0f0f0;
+  position: relative;
+  transform-origin: 0 0;
+  cursor: grab;
+}
+
+.index {
+  z-index: 999;
+}
+
+
+.non-zoomable {
+  transform: none !important; /* Reset transform to ensure it doesn't zoom */
+  position: relative; /* Ensure positioning remains correct */
+  z-index: 999;
+}
