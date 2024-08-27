@@ -9,9 +9,6 @@ const App = () => {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/app" element={<WorkSpace />} />
-
-
-      
       <Route path="/dashboard" element={<DashBoard />} />
     </Routes>
   );

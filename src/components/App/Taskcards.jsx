@@ -328,6 +328,15 @@ const Taskcards = ({ onCloseModal }) => {
                     </button>
                 </div>
             </div>
+            {/* Calendar Button Added 8/27/2024*/}
+            <div className='flex justify-end'>
+                <div className='flex justify-end m-5 max-w-fit bg-gray-700 bg-opacity-30 rounded-xl'>
+                    <button className='p-3 m-2 bg-gray-700 bg-opacity-30 rounded-xl'>
+                        calendar
+                    </button>
+                </div>
+            </div>
+
         <div className='grid lg:grid-cols-3 md:grid-cols-2 gap-4 relative m-20'  id="workspace">
         {boxes.map((box, index) => (
             <div key={index} className="relative">
@@ -405,8 +414,15 @@ const Taskcards = ({ onCloseModal }) => {
                                         <div
                                         onDragStart={(e) => handleDragStart(e, index, taskIndex)}
                                         onDragEnd={handleDragEnd}
-                                        draggable>
-                                            <DragIcon/>
+                                        draggable
+                                        className='flex'>
+                                            {/* Task Button Calendar Added 8/27/2024 */}
+                                            <button className='p-3 m-2 bg-gray-700 bg-opacity-30 rounded-xl'>
+                                                Due Date
+                                            </button>
+                                            <div className='self-center'>
+                                                <DragIcon/>
+                                            </div>
                                         </div>
                                     </div>
                                     <div
