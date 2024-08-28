@@ -6,7 +6,7 @@ const Join = ( {className} ) => {
     const navigate = useNavigate();
 
     const handleJoinNow = () => {
-        navigate('/app');
+        navigate('/register');
     };
 
     return (
