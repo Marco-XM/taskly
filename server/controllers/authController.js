@@ -1,22 +1,34 @@
 const User = require('../models/user');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
+
 
 const registerUser = async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
+    const {name, email, password } = req.body;
 
-        if (!name) return res.status(400).json({ error: 'Name is required' });
-        if (!password || password.length < 6) {
-            return res.status(400).json({ error: 'Password is required and should be at least 6 characters long' });
+    try {
+        // Check if the user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ error: 'User already exists' });
         }
-        
-        const exist = await User.findOne({ email });
-        if (exist) return res.status(409).json({ error: 'Email is already taken' });
-        
-        const user = await User.create({ name, email, password });
-        return res.json(user);
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        // Create a new user with the hashed password
+        const newUser = new User({
+            name,
+            email,
+            password: hashedPassword
+        });
+
+        await newUser.save();
+        res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        console.error('Error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        console.error('Error registering user:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 

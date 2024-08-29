@@ -11,14 +11,40 @@ const Login = () => {
         password: '',
     })
 
-    const routeRegitser = () => {
+    const routeRegister = () => {
         navigate('/register')
     }
 
-    const loginUser = (e) => {
-        e.preventdefault()
-        axios.get('/')
+const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const { email, password } = data;
+
+    console.log('Submitting login with:', { email, password });
+
+    try {
+        const response = await fetch('http://localhost:8000/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        console.log('Response status:', response.status);
+        const responseData = await response.json();
+        console.log('Response data:', responseData);
+
+        if (response.ok) {
+            localStorage.setItem('token', responseData.token);  // Store token
+            console.log('Login successful:', responseData);
+            navigate('/app');  // Navigate to the protected page after login
+        } else {
+            console.error('Login failed:', responseData.error || 'Unknown error');
+        }
+    } catch (error) {
+        console.error('Failed to login:', error);
     }
+};
+
 
     return (
         <div className='grid gap-40 grid-rows-2'>
@@ -26,12 +52,24 @@ const Login = () => {
                 <h1 className='text-7xl'>Login</h1>
             </div>
             <div className='flex justify-center'>
-                <form onSubmit={loginUser} className='flex flex-col'>
-                    <input type="email" className="text-white m-4 p-5 bg-red-50 bg-opacity-0 border-b" placeholder='Enter email...' value={data.email} onChange={(e) => setData({...data, email: e.target.value})}/>
-                    <input type="password" className="text-white m-4 p-5 bg-red-50 bg-opacity-0 border-b" placeholder='Enter password' value={data.password} onChange={(e) => setData({...data, password: e.target.value})}/>
+                <form onSubmit={handleSubmit} className='flex flex-col'>
+                    <input 
+                        type="email" 
+                        className="text-white m-4 p-5 bg-red-50 bg-opacity-0 border-b" 
+                        placeholder='Enter email...' 
+                        value={data.email} 
+                        onChange={(e) => setData({...data, email: e.target.value})}
+                    />
+                    <input 
+                        type="password" 
+                        className="text-white m-4 p-5 bg-red-50 bg-opacity-0 border-b" 
+                        placeholder='Enter password' 
+                        value={data.password} 
+                        onChange={(e) => setData({...data, password: e.target.value})}
+                    />
                     <div className='flex justify-between'>
                         <button type='submit'>Login</button>
-                        <button type='submit' onClick={routeRegitser}>Signup</button>
+                        <button type='button' onClick={routeRegister}>Signup</button>
                     </div>
                     <h3 className='flex self-end text-xs text-gray-500'>If you don't have account</h3>
                 </form>
@@ -39,4 +77,5 @@ const Login = () => {
         </div>
     )
 }
-export  default Login;
+
+export default Login;
