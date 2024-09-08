@@ -9,7 +9,7 @@ import { Toaster } from 'react-hot-toast';
 import CalendarPage from './pages/CalendarPage';
 
 // Axios default configuration
-axios.defaults.baseURL = 'http://localhost:8000';
+axios.defaults.baseURL = 'https://taskly-ozmg.vercel.app/';
 axios.defaults.withCredentials = true;
 
 // PrivateRoute component
