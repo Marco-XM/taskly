@@ -11,6 +11,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+app.use(cors({
+    origin: 'https://taskly-ozmg.vercel.app', // Replace with your frontend domain
+    credentials: true // If you are using cookies or authentication headers
+  }));app.use(express.json()); // To parse incoming JSON requests
 
 // Database Connection
 mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -18,8 +22,6 @@ mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopol
 .catch((err) => console.error('Database connection error:', err));
 
 // Middleware
-app.use(cors());
-app.use(express.json()); // To parse incoming JSON requests
 // Routes
 app.use('/api', authRoutes);
 // app.post('/login', loginUser);
