@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import TaskPopup from "./TaskPopup";
 import TaskListOptions from './TaskListOptions';
 import EditTask from './EditTask';
@@ -8,6 +9,7 @@ import BoxPopup from './BoxPopup';
 import EditBox from './EditBox';
 import BoxListOptions from './BoxListOptions';
 import ColorPicker from './ColorPicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const Taskcards = ({ onCloseModal }) => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -19,66 +21,78 @@ const Taskcards = ({ onCloseModal }) => {
     const [boxModalOpen, setBoxModalOpen] = useState(null);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
     const [selectedColor, setSelectedColor] = useState("#aabbcc");
+    const [dragImage, setDragImage] = useState(null);
     const editFormRef = useRef(null);
-
+    const navigate = useNavigate();
 
     const initialBoxes  = [
-        { name: 'Pending', tasks: [], color: 'red'},
-        { name: 'Processing', tasks: [], color: 'yellow'},
-        { name: 'Completed', tasks: [], color: '#6ee7b7'},
+        { name: 'Pending', tasks: [], color: 'red', startDate: null, endDate: null },
+        { name: 'Processing', tasks: [], color: 'yellow', startDate: null, endDate: null },
+        { name: 'Completed', tasks: [], color: '#6ee7b7', startDate: null, endDate: null },
     ];
     const [boxes, setBoxes] = useState(() => {
         const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
         return savedBoxes || initialBoxes;
     });
+
+    
+    // Save boxes and taskDates to local storage
     useEffect(() => {
         localStorage.setItem('taskBoxes', JSON.stringify(boxes));
+        // localStorage.setItem('taskDates', JSON.stringify(taskDates));
     }, [boxes]);
     const addNewBox = (boxName) => {
-        const updatedBoxes = [...boxes, { name: boxName, tasks: [], color: selectedColor}];
+        const updatedBoxes = [...boxes, { name: boxName, tasks: [], color: selectedColor, startDate: null, endDate: null }];
         setBoxes(updatedBoxes);
         closeBoxModal();
     };
 
-    useEffect(() => {
-        localStorage.setItem('taskBoxes', JSON.stringify(boxes));
-    }, [boxes]);
+    const generateId = () => {
+        return `task-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    };
+
 
     const handleColorChange = (color) => {
         setSelectedColor(color);
+    };
+
+    const handlenavigate = () => {
+        navigate('/calendar')
     };
     
     const updateBoxColor = (index, color) => {
         setBoxes(prevBoxes => 
             prevBoxes.map((box, i) => 
-                i === index ? { ...box, color: color } : box
+                i === index ? { ...box, color: color, tasks: box.tasks.map(task => ({ ...task, color: color })) } : box
             )
         );
+
+        console.log(color)
     };
+    
 
     const openBoxModal = (index) => {
         closeModal();
         toggleMenu();
         setCurrentBoxIndex(index);
         setBoxModalOpen(true);
-    }
+    };
 
     const closeBoxModal = () => {
         setCurrentBoxIndex(null);
         setBoxModalOpen(false);
-    }
+    };
 
     const openEditBoxModal = (boxIndex) => {
         closeModal();
         setCurrentBoxIndex(boxIndex);
         setEditBoxModalOpen(true);
-    }
+    };
 
     const closeEditBoxModal = () => {
         setEditBoxModalOpen(false);
         setCurrentBoxIndex(null);
-    }
-
+    };
 
     const openModal = (index) => {
         closeEditModal();
@@ -93,12 +107,30 @@ const Taskcards = ({ onCloseModal }) => {
         onCloseModal && onCloseModal();
     };
 
-    const handleAddTask = (taskName) => {
+    const handleAddTask = (taskName, startDate = null, endDate = null) => {
         const updatedBoxes = [...boxes];
-        updatedBoxes[currentBoxIndex].tasks.push(taskName);
+    
+        const newTask = {
+            id: generateId(),
+            name: taskName,
+            startDate: startDate ? startDate.toISOString().split('T')[0] : null,
+            endDate: endDate ? endDate.toISOString().split('T')[0] : null,
+        };
+    
+        updatedBoxes[currentBoxIndex].tasks.push(newTask);
+    
         setBoxes(updatedBoxes);
+        localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
+    
         closeModal();
     };
+
+    // const handleAddTask = (taskName) => {
+    //     const updatedBoxes = [...boxes];
+    //     updatedBoxes[currentBoxIndex].tasks.push(taskName);
+    //     setBoxes(updatedBoxes);
+    //     closeModal();
+    // };
 
     const openEditModal = (boxIndex, taskIndex) => {
         closeModal();
@@ -120,10 +152,18 @@ const Taskcards = ({ onCloseModal }) => {
         setCurrentTaskIndex(null);
     };
 
-    const handleEditTask = (newTaskName) => {
+    const handleEditTask = (taskName, startDate = null, endDate = null) => {
         const updatedBoxes = [...boxes];
-        updatedBoxes[currentBoxIndex].tasks[currentTaskIndex] = newTaskName;
+        const task = updatedBoxes[currentBoxIndex].tasks[currentTaskIndex];
+    
+        if (task) {
+            task.name = taskName;
+            task.startDate = startDate;
+            task.endDate = endDate;
+        }
+    
         setBoxes(updatedBoxes);
+        localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes)); // Update local storage
         closeEditModal();
     };
 
@@ -132,7 +172,7 @@ const Taskcards = ({ onCloseModal }) => {
         updatedBoxes[currentBoxIndex].name = newBoxName;
         setBoxes(updatedBoxes);
         closeEditBoxModal();
-    }
+    };
 
     const removeTask = (boxIndex, taskIndex) => {
         const updatedBoxes = [...boxes];
@@ -144,7 +184,7 @@ const Taskcards = ({ onCloseModal }) => {
         const updatedBoxes = [...boxes];
         updatedBoxes.splice(boxIndex, 1);
         setBoxes(updatedBoxes)
-    }
+    };
 
     const toggleMenu = (index) => {
         setOpenMenuIndex(openMenuIndex === index ? null : index);
@@ -163,7 +203,6 @@ const Taskcards = ({ onCloseModal }) => {
         setBoxes(updatedBoxes);
         setOpenMenuIndex(null);
     };
-    const [dragImage, setDragImage] = useState(null);
 
     const handleDragStart = (e, boxIndex, taskIndex) => {
         const taskItem = e.target.closest('.task-item');
@@ -229,7 +268,6 @@ const Taskcards = ({ onCloseModal }) => {
         // Update the state with the new boxes array
         setBoxes(updatedBoxes);
     };
-    
 
     const handleDragOver = (e) => {
         e.preventDefault();
@@ -273,6 +311,7 @@ const Taskcards = ({ onCloseModal }) => {
     
         // Close any open modals
         closeModal();
+        closeEditModal();
     
         // Calculate the correct position using getBoundingClientRect
         const rect = e.currentTarget.getBoundingClientRect();
@@ -288,7 +327,7 @@ const Taskcards = ({ onCloseModal }) => {
         setCurrentTaskIndex(taskIndex);
         setOpenMenuIndex(`${boxIndex}-${taskIndex}`);
     };
-    
+
     const handleBoxContextMenu = (e, index) => {
         e.preventDefault();
     
@@ -308,13 +347,17 @@ const Taskcards = ({ onCloseModal }) => {
         }
     };
 
-    
     useEffect(() => {
         document.addEventListener('click', handleClickOutside);
         return () => {
             document.removeEventListener('click', handleClickOutside);
         };
     },);
+
+
+// =======================================
+// const [taskDates, setTaskDates] = useState({});
+// =======================================
     
     const renderTaskCards = () => (
         <>
@@ -329,9 +372,9 @@ const Taskcards = ({ onCloseModal }) => {
                 </div>
             </div>
             {/* Calendar Button Added 8/27/2024*/}
-            <div className='flex justify-end'>
+            <div className='flex justify-end' onClick={handlenavigate}>
                 <div className='flex justify-end m-5 max-w-fit bg-gray-700 bg-opacity-30 rounded-xl'>
-                    <button className='p-3 m-2 bg-gray-700 bg-opacity-30 rounded-xl'>
+                    <button className='p-3 m-2 bg-gray-700 bg-opacity-30 rounded-xl' onClick={handlenavigate}>
                         calendar
                     </button>
                 </div>
@@ -351,6 +394,7 @@ const Taskcards = ({ onCloseModal }) => {
                     className='absolute z-50'
                     style={{ left: `${menuPosition.x}px`, top: `${menuPosition.y}px` }}
                     >
+                        {/* Box List Options */}
                         {openMenuIndex === `${index}` && (
                             <div>
                                 <BoxListOptions 
@@ -366,6 +410,7 @@ const Taskcards = ({ onCloseModal }) => {
                                 />                                
                             </div>
                         )}
+                        {/* Edit Box */}
                         {editBoxModalOpen && currentBoxIndex === index && (
                             <div ref={editFormRef} className="absolute p-5 rounded-xl z-50 bg-gray-600 bg-opacity-60 backdrop-blur-sm">
                                 <EditBox
@@ -391,6 +436,7 @@ const Taskcards = ({ onCloseModal }) => {
                 <div className='p-5 rounded-2xl'
                 key={index}
                 style={{backgroundColor: `${box.color}`}}
+                color={box.color}
                 >
                 <Draghere
                     key={index}
@@ -408,27 +454,37 @@ const Taskcards = ({ onCloseModal }) => {
                                     className="task-item flex justify-between my-5 rounded-2xl p-5 bg-gray-700 bg-opacity-30 transition-all"
                                     onContextMenu={(e) => handleContextMenu(e, index, taskIndex)}
                                     onDragEnd={handleDragEnd}>
-                                        <li className='overflow-hidden self-center transition-all'>
-                                            {task}
-                                        </li>
+                                        <div className='flex flex-col'>
+                                            <li className='overflow-hidden border-b m-2 p-1 self-start transition-all'>
+                                                {task.name}
+                                            </li>
+                                            <p className='text-xs self-end text-white bg-gray-400 bg-opacity-20 p-1 rounded-xl'>
+                                                {task.startDate && task.endDate 
+                                                    ? `${task.startDate} : ${task.endDate}` 
+                                                    : (task.startDate 
+                                                        ? `Start: ${task.startDate}` 
+                                                        : (task.endDate 
+                                                            ? `End: ${task.endDate}` 
+                                                            : ' ')
+                                                    )
+                                                }
+                                            </p>
+                                        </div>
                                         <div
                                         onDragStart={(e) => handleDragStart(e, index, taskIndex)}
                                         onDragEnd={handleDragEnd}
                                         draggable
-                                        className='flex'>
-                                            {/* Task Button Calendar Added 8/27/2024 */}
-                                            <button className='p-3 m-2 bg-gray-700 bg-opacity-30 rounded-xl'>
-                                                Due Date
-                                            </button>
-                                            <div className='self-center'>
-                                                <DragIcon/>
+                                        className='flex self-center'>
+                                            <DragIcon/>
                                             </div>
                                         </div>
+                                            <div className='self-center' key={taskIndex}>
                                     </div>
                                     <div
                                     className='absolute z-50' // Ensure the position is absolute and z-index is high
                                     style={{ left: `${menuPosition.x}px`, top: `${menuPosition.y}px` }} // Apply the mouse position
                                     >
+                                        {/* Task List Options */}
                                         {openMenuIndex === `${index}-${taskIndex}` && (
                                             <TaskListOptions
                                             style={{ position: 'absolute', left: menuPosition.x, top: menuPosition.y }}
@@ -444,6 +500,7 @@ const Taskcards = ({ onCloseModal }) => {
                                             />
                                         )}
                                     </div>
+                                        {/* Drag Here */}
                                     <div className='flex justify-center transition-all'>
                                         <Draghere
                                             key={taskIndex}
@@ -458,19 +515,24 @@ const Taskcards = ({ onCloseModal }) => {
                                 onDragOver={handleDragOver}
                                 onDrop={(e) => handleDropOnTask(e, index, box.tasks.length)}
                                 />
+                                {/* Edit Task */}
                                 {editModalOpen && currentBoxIndex === index && currentTaskIndex === taskIndex && (
-                                    <div ref={editFormRef} className="relative w-full p-5 rounded-xl z-50 bg-gray-600 bg-opacity-60 backdrop-blur-sm">
+                                    <div ref={editFormRef} className="relative w-full p-5 rounded-xl z-50 bg-gray-600 bg-opacity-30 backdrop-blur-sm">
                                         <EditTask
                                             isOpen={editModalOpen}
                                             onClose={closeEditModal}
                                             onSubmit={handleEditTask}
-                                            initialTaskName={boxes[currentBoxIndex].tasks[currentTaskIndex]}
+                                            initialTaskName={boxes[currentBoxIndex].tasks[currentTaskIndex]?.name || ''}
+                                            taskPlaceName={task.name}
+                                            initialStartDate={boxes[currentBoxIndex].tasks[currentTaskIndex]?.startDate || ''}
+                                            initialEndDate={boxes[currentBoxIndex].tasks[currentTaskIndex]?.endDate || ''}
                                             />
                                     </div>
                                 )}
                                 </div>
                         ))}
                     </ul>
+                    {/* Task PopUp */}
                     {modalOpen && currentBoxIndex === index && (
                         <TaskPopup
                         isOpen={modalOpen}
@@ -481,6 +543,7 @@ const Taskcards = ({ onCloseModal }) => {
                 </div>
             </div>
         ))}
+        {/* Box PopUp */}
         <div className='self-center'>
             {boxModalOpen && (
                 <div>
@@ -498,5 +561,4 @@ const Taskcards = ({ onCloseModal }) => {
     );
     return renderTaskCards();
 };
-
 export default Taskcards;
