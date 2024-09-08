@@ -10,6 +10,7 @@ import EditBox from './EditBox';
 import BoxListOptions from './BoxListOptions';
 import ColorPicker from './ColorPicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const Taskcards = ({ onCloseModal }) => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -361,6 +362,7 @@ const Taskcards = ({ onCloseModal }) => {
     
     const renderTaskCards = () => (
         <>
+                <SpeedInsights />
             <div className='z-50 fixed left-0 top-1/2 transfrom -translate-y-1/2 h-auto bg-gray-700 bg-opacity-30 flex flex-col justify-center items-center rounded-tr-lg rounded-br-lg' style={{ height: '50vh' }}>
                 <div className='self-center'>
                     <button

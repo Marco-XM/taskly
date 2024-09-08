@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
 import CalendarPage from './pages/CalendarPage';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 // Axios default configuration
 axios.defaults.baseURL = 'https://taskly-ozmg.vercel.app/';
