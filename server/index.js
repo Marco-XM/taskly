@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 
 // Hardcoded Frontend URL
-const FRONTEND_URL = 'https://your-frontend.vercel.app';  // Replace with your actual frontend URL
+const FRONTEND_URL = 'https://taskly-ozmg.vercel.app/';  // Replace with your actual frontend URL
 
 // Database Connection
 mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })
