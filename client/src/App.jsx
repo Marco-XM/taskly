@@ -7,9 +7,9 @@ import Login from './pages/Login';
 import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
 import CalendarPage from './pages/CalendarPage';
+
 // Axios default configuration
-const apiBaseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-axios.defaults.baseURL = apiBaseURL;
+axios.defaults.baseURL = 'https://taskly-backend-zeta.vercel.app/';
 axios.defaults.withCredentials = true;
 
 // PrivateRoute component
