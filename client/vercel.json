@@ -11,8 +11,8 @@
     ],
     "routes": [
       {
-        "src": "/(.*)",        // Matches all routes
-        "dest": "/index.html"  // Redirects all routes to index.html
+        "src": "/(.*)",        
+        "dest": "/index.html"  
       }
     ]
   }
