@@ -12,17 +12,11 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/$1",
-      "headers": {
-        "cache-control": "s-maxage=0, must-revalidate"
-      }
+      "dest": "https://taskly-backend-one.vercel.app/api/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html",
-      "headers": {
-        "cache-control": "s-maxage=0, must-revalidate"
-      }
+      "dest": "/index.html"
     }
   ]
 }
