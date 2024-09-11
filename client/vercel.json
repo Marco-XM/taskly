@@ -9,13 +9,6 @@
       }
     }
   ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html",
-      "headers": {
-        "cache-control": "s-maxage=0, must-revalidate"
-      }
-    }
-  ]
+  "routes": [{ "src": "/[^.]+", "dest": "/", "status": 200 }]
+
 }
