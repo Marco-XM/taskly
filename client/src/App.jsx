@@ -28,6 +28,7 @@ const App = () => {
         <Route path="/register" element={<Registration />} />
         <Route path="/login" element={<Login />} />
         <Route path="/calendar" element={<CalendarPage/>}/>
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </>
   );
