@@ -13,7 +13,9 @@
     {
       "src": "/(.*)",
       "dest": "/index.html",
-      "continue": true
+      "headers": {
+        "cache-control": "s-maxage=0, must-revalidate"
+      }
     }
   ]
 }
