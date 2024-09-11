@@ -2,24 +2,21 @@
   "version": 2,
   "builds": [
     {
-      "src": "package.json",
+      "src": "client/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist"
+        "distDir": "client/dist"  // This must match your Vite output directory
       }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "https://taskly-backend-one.vercel.app/api/$1"
+      "dest": "https://taskly-backend-one.vercel.app/api/$1"  
     },
     {
       "src": "/(.*)",
-      "dest": "dist/index.html"
+      "dest": "/client/dist/index.html" 
     }
-  ],
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
