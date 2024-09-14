@@ -11,7 +11,6 @@ import BoxListOptions from './BoxListOptions';
 import ColorPicker from './ColorPicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
-import jwt from 'jsonwebtoken';
 
 const Taskcards = ({ onCloseModal }) => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -109,11 +108,34 @@ const Taskcards = ({ onCloseModal }) => {
         onCloseModal && onCloseModal();
     };
 
-
+    // const handleAddTask = (taskName, startDate = null, endDate = null) => {
+    //     const updatedBoxes = [...boxes];
     
+    //     const newTask = {
+    //         id: generateId(),
+    //         name: taskName,
+    //         startDate: startDate ? startDate.toISOString().split('T')[0] : null,
+    //         endDate: endDate ? endDate.toISOString().split('T')[0] : null,
+    //     };
+    
+    //     updatedBoxes[currentBoxIndex].tasks.push(newTask);
+    
+    //     setBoxes(updatedBoxes);
+    //     localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
+    
+    //     closeModal();
+    // };
+
     const handleAddTask = async (taskName, startDate = null, endDate = null) => {
         const token = localStorage.getItem('token');
-        const { _id: userId } = jwt.decode(token); // Decode token to get user ID
+    
+        // Manually decode the JWT to get the payload (base64 decoded)
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        const { _id: userId } = JSON.parse(jsonPayload); // Extract user ID
     
         const newTask = {
             name: taskName,
