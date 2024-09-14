@@ -13,6 +13,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
 
 const Taskcards = ({ onCloseModal }) => {
+    const [tasks, setTasks] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [editBoxModalOpen, setEditBoxModalOpen] = useState(false);
@@ -43,7 +44,7 @@ const Taskcards = ({ onCloseModal }) => {
         const fetchTasks = async () => {
             try {
                 const response = await axios.get('https://taskly-backend-one.vercel.app');
-                setBoxes(response.data); // Assuming response.data is an array of tasks
+                setTasks(response.data); // Assuming response.data is an array of tasks
             } catch (error) {
                 console.error('Failed to fetch tasks:', error);
             }
