@@ -17,6 +17,23 @@ const PrivateRoute = ({ children }) => {
   return localStorage.getItem('token') ? children : <Navigate to="/login" />;
 };
 
+
+const taskBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
+
+const saveTasksToDB = async (userId) => {
+  try {
+    const response = await axios.post('https://taskly-backend-one.vercel.app/api/tasks', {
+      userId: userId,
+      taskBoxes: taskBoxes
+    });
+    console.log('Tasks Saved To DB:', response.data);
+  } catch (error) {
+    console.error('Error Saving tasks to DB:', error);
+  }
+};
+
+
+
 const App = () => {
   return (
     <>

@@ -10,6 +10,7 @@ import EditBox from './EditBox';
 import BoxListOptions from './BoxListOptions';
 import ColorPicker from './ColorPicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import axios from 'axios';
 
 const Taskcards = ({ onCloseModal }) => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -38,8 +39,17 @@ const Taskcards = ({ onCloseModal }) => {
     
     // Save boxes and taskDates to local storage
     useEffect(() => {
-        localStorage.setItem('taskBoxes', JSON.stringify(boxes));
-        // localStorage.setItem('taskDates', JSON.stringify(taskDates));
+        // Fetch tasks from the backend
+        const fetchTasks = async () => {
+            try {
+                const response = await axios.get('https://your-backend-url.com/api/tasks');
+                setBoxes(response.data); // Assuming response.data is an array of tasks
+            } catch (error) {
+                console.error('Failed to fetch tasks:', error);
+            }
+        };
+
+        fetchTasks();
     }, [boxes]);
     const addNewBox = (boxName) => {
         const updatedBoxes = [...boxes, { name: boxName, tasks: [], color: selectedColor, startDate: null, endDate: null }];
