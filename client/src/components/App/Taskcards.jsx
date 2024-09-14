@@ -11,6 +11,7 @@ import BoxListOptions from './BoxListOptions';
 import ColorPicker from './ColorPicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
+import jwt from 'jsonwebtoken';
 
 const Taskcards = ({ onCloseModal }) => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -108,23 +109,39 @@ const Taskcards = ({ onCloseModal }) => {
         onCloseModal && onCloseModal();
     };
 
-    const handleAddTask = (taskName, startDate = null, endDate = null) => {
-        const updatedBoxes = [...boxes];
+
+    
+    const handleAddTask = async (taskName, startDate = null, endDate = null) => {
+        const token = localStorage.getItem('token');
+        const { _id: userId } = jwt.decode(token); // Decode token to get user ID
     
         const newTask = {
-            id: generateId(),
             name: taskName,
             startDate: startDate ? startDate.toISOString().split('T')[0] : null,
             endDate: endDate ? endDate.toISOString().split('T')[0] : null,
+            userId: userId, // Add user ID to the task data
         };
     
-        updatedBoxes[currentBoxIndex].tasks.push(newTask);
+        try {
+            // Send the new task to the backend
+            await axios.post('/api/tasks', newTask, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
     
-        setBoxes(updatedBoxes);
-        localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
+            // Update local state and local storage
+            const updatedBoxes = [...boxes];
+            updatedBoxes[currentBoxIndex].tasks.push(newTask);
     
-        closeModal();
+            setBoxes(updatedBoxes);
+            localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
+    
+            closeModal();
+        } catch (error) {
+            console.error('Error saving task:', error);
+            // Optionally, show error to the user
+        }
     };
+    
 
     // const handleAddTask = (taskName) => {
     //     const updatedBoxes = [...boxes];
