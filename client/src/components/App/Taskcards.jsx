@@ -149,6 +149,8 @@ const Taskcards = ({ onCloseModal }) => {
             await axios.post(`/api/tasks/${userId}`, newTask, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+            console.log(userId);
+            console.log(token);
     
             // Update local state and local storage
             const updatedBoxes = [...boxes];
