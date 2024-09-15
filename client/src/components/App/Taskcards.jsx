@@ -128,7 +128,8 @@ const Taskcards = ({ onCloseModal }) => {
 
     const handleAddTask = async (taskName, startDate = null, endDate = null) => {
         const token = localStorage.getItem('token');
-    
+        console.log(userId);
+        console.log(token);
         // Manually decode the JWT to get the payload (base64 decoded)
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -149,8 +150,7 @@ const Taskcards = ({ onCloseModal }) => {
             await axios.post(`/api/tasks/${userId}`, newTask, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            console.log(userId);
-            console.log(token);
+
     
             // Update local state and local storage
             const updatedBoxes = [...boxes];
