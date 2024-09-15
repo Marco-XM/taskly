@@ -146,7 +146,7 @@ const Taskcards = ({ onCloseModal }) => {
     
         try {
             // Send the new task to the backend
-            await axios.post('/api/tasks', newTask, {
+            await axios.post(`/api/tasks/${userId}`, newTask, {
                 headers: { Authorization: `Bearer ${token}` }
             });
     
