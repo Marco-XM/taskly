@@ -10,7 +10,9 @@ import EditBox from './EditBox';
 import BoxListOptions from './BoxListOptions';
 import ColorPicker from './ColorPicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import * as jwt_decode from 'jwt-decode';
 import axios from 'axios';
+
 
 const Taskcards = ({ onCloseModal }) => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -133,22 +135,18 @@ const Taskcards = ({ onCloseModal }) => {
             return; // Handle error appropriately, e.g., redirect to login
         }
     
-        // Manually decode the JWT to get the payload (base64 decoded)
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        const { _id: userId } = JSON.parse(jsonPayload); // Extract user ID
-    
-        const newTask = {
-            name: taskName,
-            startDate: startDate ? startDate.toISOString().split('T')[0] : null,
-            endDate: endDate ? endDate.toISOString().split('T')[0] : null,
-            userId: userId, // Add user ID to the task data
-        };
-    
         try {
+            // Decode the JWT to get the payload
+            const decodedToken = jwt_decode(token);
+            const userId = decodedToken._id; // Extract user ID
+    
+            const newTask = {
+                name: taskName,
+                startDate: startDate ? startDate.toISOString().split('T')[0] : null,
+                endDate: endDate ? endDate.toISOString().split('T')[0] : null,
+                userId: userId, // Add user ID to the task data
+            };
+    
             // Send the new task to the backend
             await axios.post(`https://taskly-backend-one.vercel.app/api/tasks/${userId}`, newTask, {
                 headers: { Authorization: `Bearer ${token}` }
