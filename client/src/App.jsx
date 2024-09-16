@@ -11,6 +11,8 @@ import CalendarPage from './pages/CalendarPage';
 // Axios default configuration
 axios.defaults.baseURL = 'https://taskly-backend-one.vercel.app';
 axios.defaults.withCredentials = true;
+axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+
 
 // PrivateRoute component
 const PrivateRoute = ({ children }) => {
@@ -18,19 +20,19 @@ const PrivateRoute = ({ children }) => {
 };
 
 
-const taskBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
+// const taskBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
 
-const saveTasksToDB = async (userId) => {
-  try {
-    const response = await axios.post('https://taskly-backend-one.vercel.app/api/tasks', {
-      userId: userId,
-      taskBoxes: taskBoxes
-    });
-    console.log('Tasks Saved To DB:', response.data);
-  } catch (error) {
-    console.error('Error Saving tasks to DB:', error);
-  }
-};
+// const saveTasksToDB = async (userId) => {
+//   try {
+//     const response = await axios.post('https://taskly-backend-one.vercel.app/api/tasks', {
+//       userId: userId,
+//       taskBoxes: taskBoxes
+//     });
+//     console.log('Tasks Saved To DB:', response.data);
+//   } catch (error) {
+//     console.error('Error Saving tasks to DB:', error);
+//   }
+// };
 
 
 

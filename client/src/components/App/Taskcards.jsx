@@ -10,7 +10,6 @@ import EditBox from './EditBox';
 import BoxListOptions from './BoxListOptions';
 import ColorPicker from './ColorPicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import * as jwt_decode from 'jwt-decode';
 import axios from 'axios';
 
 
@@ -128,6 +127,29 @@ const Taskcards = ({ onCloseModal }) => {
     //     closeModal();
     // };
 
+
+    const base64UrlDecode = (str) => {
+        // Convert Base64Url to Base64
+        let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+        // Pad Base64 string if necessary
+        while (base64.length % 4 !== 0) {
+            base64 += '=';
+        }
+        // Decode Base64 string to a string
+        return atob(base64);
+    };
+    
+    const decodeJwt = (token) => {
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+            throw new Error('JWT does not have 3 parts');
+        }
+    
+        const payload = parts[1];
+        const decodedPayload = base64UrlDecode(payload);
+        return JSON.parse(decodedPayload);
+    };
+    
     const handleAddTask = async (taskName, startDate = null, endDate = null) => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -137,7 +159,7 @@ const Taskcards = ({ onCloseModal }) => {
     
         try {
             // Decode the JWT to get the payload
-            const decodedToken = jwt_decode(token);
+            const decodedToken = decodeJwt(token);
             const userId = decodedToken._id; // Extract user ID
     
             const newTask = {
@@ -147,24 +169,36 @@ const Taskcards = ({ onCloseModal }) => {
                 userId: userId, // Add user ID to the task data
             };
     
-            // Send the new task to the backend
-            await axios.post(`https://taskly-backend-one.vercel.app/api/tasks/${userId}`, newTask, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-    
-            // Update local state and local storage
+            // Update local state and local storage first
             const updatedBoxes = [...boxes];
             updatedBoxes[currentBoxIndex].tasks.push(newTask);
     
             setBoxes(updatedBoxes);
             localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
     
+            // Now send the new task to the backend
+            try {
+                await axios.post(`https://taskly-backend-one.vercel.app/api/tasks/${userId}`, newTask, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                // Handle success if needed
+            } catch (apiError) {
+                console.error('Error saving task to backend:', apiError);
+                // Optionally, remove the task from local storage or state if the API request fails
+                const rollbackBoxes = [...updatedBoxes];
+                rollbackBoxes[currentBoxIndex].tasks = rollbackBoxes[currentBoxIndex].tasks.filter(task => task !== newTask);
+                setBoxes(rollbackBoxes);
+                localStorage.setItem('taskBoxes', JSON.stringify(rollbackBoxes));
+            }
+    
             closeModal();
         } catch (error) {
-            console.error('Error saving task:', error);
+            console.error('Error handling task:', error);
             // Optionally, show error to the user
         }
     };
+    
+
     
     
 
