@@ -11,7 +11,7 @@ import BoxListOptions from './BoxListOptions';
 import ColorPicker from './ColorPicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
-import jwt_decode from 'jwt-decode';
+import * as jwt_decode from 'jwt-decode';
 
 
 const Taskcards = ({ onCloseModal }) => {
