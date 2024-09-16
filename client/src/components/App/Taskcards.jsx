@@ -126,6 +126,8 @@ const Taskcards = ({ onCloseModal }) => {
     //     closeModal();
     // };
 
+    import jwt_decode from 'jwt-decode';
+
     const handleAddTask = async (taskName, startDate = null, endDate = null) => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -133,22 +135,21 @@ const Taskcards = ({ onCloseModal }) => {
             return; // Handle error appropriately, e.g., redirect to login
         }
     
-        // Manually decode the JWT to get the payload (base64 decoded)
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        const { _id: userId } = JSON.parse(jsonPayload); // Extract user ID
-    
-        const newTask = {
-            name: taskName,
-            startDate: startDate ? startDate.toISOString().split('T')[0] : null,
-            endDate: endDate ? endDate.toISOString().split('T')[0] : null,
-            userId: userId, // Add user ID to the task data
-        };
-    
         try {
+            // Decode the token to get the userId
+            const decodedToken = jwt_decode(token);
+            console.log("Decoded Token:", decodedToken); // Log the entire decoded token
+    
+            const userId = decodedToken._id; // Assuming userId is stored in _id
+            console.log("Extracted User ID:", userId); // Log the userId
+    
+            const newTask = {
+                name: taskName,
+                startDate: startDate ? startDate.toISOString().split('T')[0] : null,
+                endDate: endDate ? endDate.toISOString().split('T')[0] : null,
+                userId: userId, // Add user ID to the task data
+            };
+    
             // Send the new task to the backend
             await axios.post(`https://taskly-backend-one.vercel.app/api/tasks/${userId}`, newTask, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -167,6 +168,7 @@ const Taskcards = ({ onCloseModal }) => {
             // Optionally, show error to the user
         }
     };
+    
     
     
 
