@@ -13,6 +13,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
 
 
+
 const Taskcards = ({ onCloseModal }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
@@ -179,7 +180,7 @@ const Taskcards = ({ onCloseModal }) => {
             // Now send the new task to the backend
             try {
                 await axios.post(`https://taskly-backend-one.vercel.app/api/tasks/${userId}`, newTask, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    headers: { Authorization: `Bearer ${token}` }
                 });
                 // Handle success if needed
             } catch (apiError) {
