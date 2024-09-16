@@ -11,6 +11,8 @@ import BoxListOptions from './BoxListOptions';
 import ColorPicker from './ColorPicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
+import jwt_decode from 'jwt-decode';
+
 
 const Taskcards = ({ onCloseModal }) => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -126,7 +128,6 @@ const Taskcards = ({ onCloseModal }) => {
     //     closeModal();
     // };
 
-    import jwt_decode from 'jwt-decode';
 
     const handleAddTask = async (taskName, startDate = null, endDate = null) => {
         const token = localStorage.getItem('token');
