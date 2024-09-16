@@ -27,6 +27,30 @@ const Taskcards = ({ onCloseModal }) => {
     const [dragImage, setDragImage] = useState(null);
     const editFormRef = useRef(null);
     const navigate = useNavigate();
+    const [taskBoxes, setTaskBoxes] = useState([]);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchTaskBoxes = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
+
+            try {
+                const response = await axios.get('/api/task-boxes', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setTaskBoxes(response.data);
+            } catch (err) {
+                console.error('Error fetching task boxes:', err.response ? err.response.data : err.message);
+                setError('Failed to fetch task boxes');
+            }
+        };
+
+        fetchTaskBoxes();
+    }, []);
 
     const initialBoxes  = [
         { name: 'Pending', tasks: [], color: 'red'},
@@ -37,33 +61,18 @@ const Taskcards = ({ onCloseModal }) => {
         const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
         return savedBoxes || initialBoxes;
     });
-    const base64UrlDecode = (str) => {
-        // Convert Base64Url to Base64
-        let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
-        // Pad Base64 string if necessary
-        while (base64.length % 4 !== 0) {
-            base64 += '=';
-        }
-        // Decode Base64 string to a string
-        return atob(base64);
-    };
-    
-    const decodeJwt = (token) => {
-        const parts = token.split('.');
-        if (parts.length !== 3) {
-            throw new Error('JWT does not have 3 parts');
-        }
-    
-        const payload = parts[1];
-        const decodedPayload = base64UrlDecode(payload);
-        return JSON.parse(decodedPayload);
-    };
+
     
     // Save boxes and taskDates to local storage
     useEffect(() => {
 
         localStorage.setItem('taskBoxes', JSON.stringify(boxes));
     }, [boxes]);
+    // const addNewBox = (boxName) => {
+    //     const updatedBoxes = [...boxes, { name: boxName, tasks: [], color: selectedColor}];
+    //     setBoxes(updatedBoxes);
+    //     closeBoxModal();
+    // };
     const addNewBox = async (boxName) => {
         const token = localStorage.getItem('token');
         const decodedToken = decodeJwt(token);
@@ -88,8 +97,6 @@ const Taskcards = ({ onCloseModal }) => {
             console.error('Error adding new box:', error.response?.data || error);
         }
     };
-    
-    
 
     const generateId = () => {
         return `task-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
@@ -170,7 +177,27 @@ const Taskcards = ({ onCloseModal }) => {
     // };`
 
 
-
+    const base64UrlDecode = (str) => {
+        // Convert Base64Url to Base64
+        let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+        // Pad Base64 string if necessary
+        while (base64.length % 4 !== 0) {
+            base64 += '=';
+        }
+        // Decode Base64 string to a string
+        return atob(base64);
+    };
+    
+    const decodeJwt = (token) => {
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+            throw new Error('JWT does not have 3 parts');
+        }
+    
+        const payload = parts[1];
+        const decodedPayload = base64UrlDecode(payload);
+        return JSON.parse(decodedPayload);
+    };
     
     const handleAddTask = async (taskName, startDate = null, endDate = null) => {
         const token = localStorage.getItem('token');
@@ -482,7 +509,7 @@ const Taskcards = ({ onCloseModal }) => {
 
         <div className='grid lg:grid-cols-3 md:grid-cols-2 gap-4 relative m-20'  id="workspace">
         {boxes.map((box, index) => (
-            <div key={index} className="relative">
+            <div key={box._id} className="relative">
                 <div className='flex justify-between'
                     onDrop={(e) => handleDropOnTask(e, index)}
                     onDragOver={handleDragOver}
