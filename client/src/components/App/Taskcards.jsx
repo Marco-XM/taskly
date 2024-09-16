@@ -44,11 +44,35 @@ const Taskcards = ({ onCloseModal }) => {
 
         localStorage.setItem('taskBoxes', JSON.stringify(boxes));
     }, [boxes]);
-    const addNewBox = (boxName) => {
-        const updatedBoxes = [...boxes, { name: boxName, tasks: [], color: selectedColor, startDate: null, endDate: null }];
-        setBoxes(updatedBoxes);
-        closeBoxModal();
+    const addNewBox = async (boxName) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No token found');
+            return; // Handle the error, e.g., redirect to login
+        }
+    
+        try {
+            // Send the new box to the backend to save it in the database
+            const response = await axios.post(
+                '/api/task-boxes',
+                { name: boxName, color: selectedColor},
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            // The response should include the saved box with the assigned boxId from the database
+            const savedBox = response.data;
+    
+            // Add the new box (with boxId) to the local state
+            const updatedBoxes = [...boxes, { ...savedBox, tasks: [] }];
+            setBoxes(updatedBoxes);
+    
+            closeBoxModal(); // Close the modal after adding the box
+        } catch (error) {
+            console.error('Error adding new box:', error);
+            // Handle error (e.g., show error message to the user)
+        }
     };
+    
 
     const generateId = () => {
         return `task-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
@@ -126,7 +150,7 @@ const Taskcards = ({ onCloseModal }) => {
     //     localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
     
     //     closeModal();
-    // };
+    // };`
 
 
     const base64UrlDecode = (str) => {
