@@ -27,30 +27,7 @@ const Taskcards = ({ onCloseModal }) => {
     const [dragImage, setDragImage] = useState(null);
     const editFormRef = useRef(null);
     const navigate = useNavigate();
-    const [taskBoxes, setTaskBoxes] = useState([]);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        const fetchTaskBoxes = async () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
-
-            try {
-                const response = await axios.get('/api/task-boxes', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                setTaskBoxes(response.data);
-            } catch (err) {
-                console.error('Error fetching task boxes:', err.response ? err.response.data : err.message);
-                setError('Failed to fetch task boxes');
-            }
-        };
-
-        fetchTaskBoxes();
-    }, []);
+    
 
     const initialBoxes  = [
         { name: 'Pending', tasks: [], color: 'red'},
