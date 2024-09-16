@@ -66,6 +66,8 @@ const Taskcards = ({ onCloseModal }) => {
     }, [boxes]);
     const addNewBox = async (boxName) => {
         const token = localStorage.getItem('token');
+        const decodedToken = decodeJwt(token);
+        const userId = decodedToken._id; // Extract user ID
         if (!token) {
             console.error('No token found');
             return;
@@ -73,7 +75,7 @@ const Taskcards = ({ onCloseModal }) => {
     
         try {
             const response = await axios.post(
-                '/api/task-boxes',
+                `/api/task-boxes/${userId}`,
                 { name: boxName, color: selectedColor }, // Only send name and color
                 { headers: { Authorization: `Bearer ${token}` } }
             );
