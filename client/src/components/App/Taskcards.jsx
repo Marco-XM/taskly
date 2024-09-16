@@ -29,9 +29,9 @@ const Taskcards = ({ onCloseModal }) => {
     const navigate = useNavigate();
 
     const initialBoxes  = [
-        { name: 'Pending', tasks: [], color: 'red', startDate: null, endDate: null },
-        { name: 'Processing', tasks: [], color: 'yellow', startDate: null, endDate: null },
-        { name: 'Completed', tasks: [], color: '#6ee7b7', startDate: null, endDate: null },
+        { name: 'Pending', tasks: [], color: 'red'},
+        { name: 'Processing', tasks: [], color: 'yellow'},
+        { name: 'Completed', tasks: [], color: '#6ee7b7'},
     ];
     const [boxes, setBoxes] = useState(() => {
         const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
@@ -48,30 +48,25 @@ const Taskcards = ({ onCloseModal }) => {
         const token = localStorage.getItem('token');
         if (!token) {
             console.error('No token found');
-            return; // Handle the error, e.g., redirect to login
+            return;
         }
     
         try {
-            // Send the new box to the backend to save it in the database
             const response = await axios.post(
                 '/api/task-boxes',
-                { name: boxName, color: selectedColor},
+                { name: boxName, color: selectedColor }, // Only send name and color
                 { headers: { Authorization: `Bearer ${token}` } }
             );
     
-            // The response should include the saved box with the assigned boxId from the database
             const savedBox = response.data;
-    
-            // Add the new box (with boxId) to the local state
-            const updatedBoxes = [...boxes, { ...savedBox, tasks: [] }];
-            setBoxes(updatedBoxes);
-    
-            closeBoxModal(); // Close the modal after adding the box
+            const updatedBoxes = [...boxes, savedBox]; // The backend will return the full box object
+            setBoxes(updatedBoxes); // Update the state with the new box
+            closeBoxModal();
         } catch (error) {
-            console.error('Error adding new box:', error);
-            // Handle error (e.g., show error message to the user)
+            console.error('Error adding new box:', error.response?.data || error);
         }
     };
+    
     
 
     const generateId = () => {
