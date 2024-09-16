@@ -37,7 +37,27 @@ const Taskcards = ({ onCloseModal }) => {
         const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
         return savedBoxes || initialBoxes;
     });
-
+    const base64UrlDecode = (str) => {
+        // Convert Base64Url to Base64
+        let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+        // Pad Base64 string if necessary
+        while (base64.length % 4 !== 0) {
+            base64 += '=';
+        }
+        // Decode Base64 string to a string
+        return atob(base64);
+    };
+    
+    const decodeJwt = (token) => {
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+            throw new Error('JWT does not have 3 parts');
+        }
+    
+        const payload = parts[1];
+        const decodedPayload = base64UrlDecode(payload);
+        return JSON.parse(decodedPayload);
+    };
     
     // Save boxes and taskDates to local storage
     useEffect(() => {
@@ -148,27 +168,7 @@ const Taskcards = ({ onCloseModal }) => {
     // };`
 
 
-    const base64UrlDecode = (str) => {
-        // Convert Base64Url to Base64
-        let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
-        // Pad Base64 string if necessary
-        while (base64.length % 4 !== 0) {
-            base64 += '=';
-        }
-        // Decode Base64 string to a string
-        return atob(base64);
-    };
-    
-    const decodeJwt = (token) => {
-        const parts = token.split('.');
-        if (parts.length !== 3) {
-            throw new Error('JWT does not have 3 parts');
-        }
-    
-        const payload = parts[1];
-        const decodedPayload = base64UrlDecode(payload);
-        return JSON.parse(decodedPayload);
-    };
+
     
     const handleAddTask = async (taskName, startDate = null, endDate = null) => {
         const token = localStorage.getItem('token');
