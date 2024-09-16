@@ -128,6 +128,10 @@ const Taskcards = ({ onCloseModal }) => {
 
     const handleAddTask = async (taskName, startDate = null, endDate = null) => {
         const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No token found');
+            return; // Handle error appropriately, e.g., redirect to login
+        }
     
         // Manually decode the JWT to get the payload (base64 decoded)
         const base64Url = token.split('.')[1];
@@ -146,7 +150,7 @@ const Taskcards = ({ onCloseModal }) => {
     
         try {
             // Send the new task to the backend
-            await axios.post(`/api/tasks/${userId}`, newTask, {
+            await axios.post(`https://taskly-backend-one.vercel.app/api/tasks/${userId}`, newTask, {
                 headers: { Authorization: `Bearer ${token}` }
             });
     
@@ -163,6 +167,7 @@ const Taskcards = ({ onCloseModal }) => {
             // Optionally, show error to the user
         }
     };
+    
     
 
     // const handleAddTask = (taskName) => {
