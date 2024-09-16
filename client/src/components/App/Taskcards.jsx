@@ -152,6 +152,8 @@ const Taskcards = ({ onCloseModal }) => {
             };
     
             // Send the new task to the backend
+            console.log("About to send request:", newTask, token);
+
             await axios.post(`https://taskly-backend-one.vercel.app/api/tasks/${userId}`, newTask, {
                 headers: { Authorization: `Bearer ${token}` }
             });
