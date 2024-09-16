@@ -34,15 +34,40 @@ const Taskcards = ({ onCloseModal }) => {
         { name: 'Processing', tasks: [], color: 'yellow'},
         { name: 'Completed', tasks: [], color: '#6ee7b7'},
     ];
-    const [boxes, setBoxes] = useState(() => {
-        const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
-        return savedBoxes || initialBoxes;
-    });
+    // const [boxes, setBoxes] = useState(() => {
+    //     const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
+    //     return savedBoxes || initialBoxes;
+    // });
 
-    
+    const [boxes, setBoxes] = useState([]);
+
     // Save boxes and taskDates to local storage
     useEffect(() => {
+        const fetchTaskBoxes = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
 
+            try {
+                const decodedToken = decodeJwt(token);
+                const userId = decodedToken._id; // Extract user ID
+
+                const response = await axios.get(`/api/task-boxes/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setBoxes(response.data); // Set the state with the fetched data
+            } catch (error) {
+                console.error('Error fetching task boxes:', error.response?.data || error);
+            }
+        };
+
+        fetchTaskBoxes();
+    }, []); // Run only on component mount
+
+    // Save task boxes to localStorage whenever they change
+    useEffect(() => {
         localStorage.setItem('taskBoxes', JSON.stringify(boxes));
     }, [boxes]);
     // const addNewBox = (boxName) => {
