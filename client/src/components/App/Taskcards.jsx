@@ -141,12 +141,35 @@ const Taskcards = ({ onCloseModal }) => {
         navigate('/calendar')
     };
     
-    const updateBoxColor = (index, color) => {
-        setBoxes(prevBoxes => 
-            prevBoxes.map((box, i) => 
-                i === index ? { ...box, color: color, tasks: box.tasks.map(task => ({ ...task, color: color })) } : box
-            )
-        );
+    const updateBoxColor = async (index, color) => {
+        const token = localStorage.getItem('token');
+        const boxId = boxes[currentBoxIndex]._id;
+        const decodedToken = decodeJwt(token);
+        const userId = decodedToken._id;
+    
+        // console.log('Box ID:', boxId, 'New Color:', color); // Logging for debugging
+    
+        if (!token) {
+            console.error('No token found');
+            return;
+        }
+    
+        try {
+            const updatedBoxes = [...boxes];
+            updatedBoxes[currentBoxIndex].color = color;  // Update local state
+            setBoxes(updatedBoxes);
+    
+            // Update color in DB
+            const response = await axios.put(
+                `/api/task-boxes/${userId}/${boxId}/color`,
+                { color: color },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            console.log('API Response:', response.data);
+        } catch (error) {
+            console.error('Error updating box color:', error.response?.data || error);
+        }
 
         console.log(color)
     };
