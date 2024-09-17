@@ -338,34 +338,27 @@ const Taskcards = ({ onCloseModal }) => {
     };
 
     const removeBox = async (boxIndex) => {
+        const boxId = boxes[boxIndex]._id; // Get the ID of the box to be removed
         const updatedBoxes = [...boxes];
-        updatedBoxes.splice(boxIndex, 1);
-        setBoxes(updatedBoxes);
-
-        const token = localStorage.getItem('token');
-        const decodedToken = decodeJwt(token);
-        const userId = decodedToken._id;
-
-        if(!token) {
-            console.error('No token found');
-            return;
-        }
-
-        const boxId = boxes[currentBoxIndex]._id; // Get the ID of the box to be updated
+        updatedBoxes.splice(boxIndex, 1); // Optimistically remove the box from the UI
+    
+        setBoxes(updatedBoxes); // Update local state
+    
+        const token = localStorage.getItem('token'); // Get the authentication token
     
         try {
-            // Make the request to update the box
-            await axios.delete(
-                `/api/task-boxes/${userId}/${boxId}`, // API route to delete a box
-                { headers: { Authorization: `Bearer ${token}` } }
-            );    
+            // Send request to delete the box from the database
+            await axios.delete(`/api/task-boxes/${boxId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
         } catch (error) {
-            console.error('Error deleting box:',error);
-
+            console.error('Error deleting box:', error);
+            // Revert UI changes if the API call fails
             setBoxes(prevBoxes => [...prevBoxes.slice(0, boxIndex), boxes[boxIndex], ...prevBoxes.slice(boxIndex + 1)]);
-
+            // Optionally, show an error message to the user
         }
     };
+    
 
     const toggleMenu = (index) => {
         setOpenMenuIndex(openMenuIndex === index ? null : index);
