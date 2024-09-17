@@ -35,10 +35,8 @@ const Taskcards = ({ onCloseModal }) => {
         { name: 'Completed', tasks: [], color: '#6ee7b7'},
     ];
     const [boxes, setBoxes] = useState(() => {
-        const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
-        return savedBoxes || initialBoxes;
+        return boxes || initialBoxes;
     });
-    console.log('Boxes:', boxes);
     // const [boxes, setBoxes] = useState([]);
 
     // Save boxes and taskDates to local storage
