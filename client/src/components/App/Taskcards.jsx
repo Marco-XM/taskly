@@ -34,26 +34,25 @@ const Taskcards = ({ onCloseModal }) => {
         { name: 'Processing', tasks: [], color: 'yellow'},
         { name: 'Completed', tasks: [], color: '#6ee7b7'},
     ];
-    // const [boxes, setBoxes] = useState(() => {
-    //     const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
-    //     return savedBoxes || initialBoxes;
-    // });
+    const [boxes, setBoxes] = useState(() => {
+        const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
+        return savedBoxes || initialBoxes;
+    });
 
-    const [boxes, setBoxes] = useState([]);
+    // const [boxes, setBoxes] = useState([]);
 
     // Save boxes and taskDates to local storage
     useEffect(() => {
         const fetchTaskBoxes = async () => {
             const token = localStorage.getItem('token');
+            const decodedToken = decodeJwt(token); // Assuming decodeJwt correctly decodes the token
+            const userId = decodedToken._id;
             if (!token) {
                 console.error('No token found');
                 return;
             }
 
             try {
-                const decodedToken = decodeJwt(token);
-                const userId = decodedToken._id; // Extract user ID
-
                 const response = await axios.get(`/api/task-boxes/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
