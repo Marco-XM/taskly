@@ -294,6 +294,11 @@ const Taskcards = ({ onCloseModal }) => {
     //     closeEditBoxModal();
     // };
     const handleEditBox = async (newBoxName) => {
+        const updatedBoxes = [...boxes];
+        updatedBoxes[currentBoxIndex].name = newBoxName;
+        setBoxes(updatedBoxes); // Optimistically update UI
+        closeEditBoxModal(); // Close the edit box modal after successful update
+        
         const token = localStorage.getItem('token');
         const decodedToken = decodeJwt(token);
         const userId = decodedToken._id;
@@ -320,7 +325,6 @@ const Taskcards = ({ onCloseModal }) => {
                 box._id === updatedBox._id ? updatedBox : box
             ));
     
-            closeEditBoxModal(); // Close the edit box modal after successful update
         } catch (error) {
             console.error('Error updating box:', error.response?.data || error);
         }
