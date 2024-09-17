@@ -113,16 +113,6 @@ const Taskcards = ({ onCloseModal }) => {
     const handlenavigate = () => {
         navigate('/calendar')
     };
-    
-    // const updateBoxColor = (index, color) => {
-    //     setBoxes(prevBoxes => 
-    //         prevBoxes.map((box, i) => 
-    //             i === index ? { ...box, color: color, tasks: box.tasks.map(task => ({ ...task, color: color })) } : box
-    //         )
-    //     );
-
-    //     console.log(color)
-    // };
 
     const updateBoxColor = async (index, color) => {
         const token = localStorage.getItem('token');
@@ -166,8 +156,7 @@ const Taskcards = ({ onCloseModal }) => {
     
         console.log('Selected color:', color);
     };
-    
-    
+    // done
 
     const openBoxModal = (index) => {
         closeModal();
@@ -221,7 +210,7 @@ const Taskcards = ({ onCloseModal }) => {
     //     localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
     
     //     closeModal();
-    // };`
+    // };
 
 
     const base64UrlDecode = (str) => {
@@ -482,19 +471,67 @@ const Taskcards = ({ onCloseModal }) => {
         setOpenMenuIndex(openMenuIndex === index ? null : index);
     };
 
-    const moveTask = (boxIndex, taskIndex, direction) => {
-        const updatedBoxes = [...boxes];
-        const task = updatedBoxes[boxIndex].tasks.splice(taskIndex, 1)[0];
+    // const moveTask = (boxIndex, taskIndex, direction) => {
+    //     const updatedBoxes = [...boxes];
+    //     const task = updatedBoxes[boxIndex].tasks.splice(taskIndex, 1)[0];
 
-        if (direction === 'prev' && boxIndex > 0) {
-            updatedBoxes[boxIndex - 1].tasks.push(task);
-        } else if (direction === 'next' && boxIndex < boxes.length - 1) {
-            updatedBoxes[boxIndex + 1].tasks.push(task);
+    //     if (direction === 'prev' && boxIndex > 0) {
+    //         updatedBoxes[boxIndex - 1].tasks.push(task);
+    //     } else if (direction === 'next' && boxIndex < boxes.length - 1) {
+    //         updatedBoxes[boxIndex + 1].tasks.push(task);
+    //     }
+
+    //     setBoxes(updatedBoxes);
+    //     setOpenMenuIndex(null);
+    // };
+
+    const moveTask = async (boxIndex, taskIndex, direction) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No token found');
+            return;
         }
-
-        setBoxes(updatedBoxes);
-        setOpenMenuIndex(null);
+    
+        const decodedToken = decodeJwt(token);
+        const userId = decodedToken._id;
+    
+        // Ensure the box and task exist
+        if (boxIndex < 0 || boxIndex >= boxes.length || taskIndex < 0 || taskIndex >= boxes[boxIndex].tasks.length) {
+            console.error('Invalid box or task index');
+            return;
+        }
+    
+        const task = boxes[boxIndex].tasks[taskIndex];
+        const boxId = boxes[boxIndex]._id;
+        const targetBoxIndex = direction === 'prev' ? boxIndex - 1 : direction === 'next' ? boxIndex + 1 : boxIndex;
+        const targetBoxId = boxes[targetBoxIndex]?._id;
+    
+        if (targetBoxIndex < 0 || targetBoxIndex >= boxes.length) {
+            console.error('Invalid target box index');
+            return;
+        }
+    
+        try {
+            // Update local state
+            const updatedBoxes = [...boxes];
+            updatedBoxes[boxIndex].tasks.splice(taskIndex, 1); // Remove task from current box
+            updatedBoxes[targetBoxIndex].tasks.push(task); // Add task to the new box
+    
+            setBoxes(updatedBoxes);
+            setOpenMenuIndex(null);
+    
+            // Update task position in the backend
+            await axios.put(
+                `/api/task-boxes/${userId}/${boxId}/tasks/${task._id}/move`,
+                { targetBoxId: targetBoxId, direction: direction }, // Payload
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+        } catch (error) {
+            console.error('Error moving task:', error.response?.data || error);
+        }
     };
+    
 
     const handleDragStart = (e, boxIndex, taskIndex) => {
         const taskItem = e.target.closest('.task-item');
