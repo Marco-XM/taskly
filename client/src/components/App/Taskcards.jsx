@@ -76,8 +76,7 @@ const Taskcards = ({ onCloseModal }) => {
     // };
     const addNewBox = async (boxName) => {
         const token = localStorage.getItem('token');
-        const decodedToken = decodeJwt(token);
-        const userId = decodedToken._id; // Extract user ID
+    
         if (!token) {
             console.error('No token found');
             return;
@@ -85,19 +84,20 @@ const Taskcards = ({ onCloseModal }) => {
     
         try {
             const response = await axios.post(
-                `/api/task-boxes/${userId}`,
+                '/api/task-boxes',
                 { name: boxName, color: selectedColor }, // Only send name and color
-                { headers: { Authorization: `Bearer ${token}` } }
+                { headers: { Authorization: `Bearer ${token}` } } // Attach the token
             );
     
             const savedBox = response.data;
-            const updatedBoxes = [...boxes, savedBox]; // The backend will return the full box object
-            setBoxes(updatedBoxes); // Update the state with the new box
+            const updatedBoxes = [...boxes, savedBox];
+            setBoxes(updatedBoxes);
             closeBoxModal();
         } catch (error) {
             console.error('Error adding new box:', error.response?.data || error);
         }
     };
+    
 
     const generateId = () => {
         return `task-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
