@@ -48,19 +48,23 @@ const Taskcards = ({ onCloseModal }) => {
             const decodedToken = decodeJwt(token);
             const userId = decodedToken._id;
     
+            console.log('Fetching boxes for user:', userId); // Debug logging
+    
             try {
                 const response = await axios.get(`/api/task-boxes/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
     
-                setBoxes(response.data);
+                console.log('API response:', response.data); // Debug logging
+                setBoxes(response.data.boxes || []); // Adjust based on actual API response structure
             } catch (error) {
                 console.error('Error fetching task boxes:', error.response?.data || error);
             }
         };
     
         fetchBoxes();
-    }, []);  // Run only on component mount
+    }, []);
+      // Run only on component mount
 
     // Save task boxes to localStorage whenever they change
     // useEffect(() => {
