@@ -705,9 +705,8 @@ const Taskcards = ({ onCloseModal }) => {
                     </button>
                 </div>
                 <div className='p-5 rounded-2xl'
-                key={index}
+                key={box._id}
                 style={{backgroundColor: `${box.color}`}}
-                color={box.color}
                 >
                 <Draghere
                     key={index}
