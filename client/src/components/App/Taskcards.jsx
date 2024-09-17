@@ -124,36 +124,49 @@ const Taskcards = ({ onCloseModal }) => {
     //     console.log(color)
     // };
 
-    const updateBoxColor = async (color) => {
+    const updateBoxColor = async (index, color) => {
         const token = localStorage.getItem('token');
-        const boxId = boxes[currentBoxIndex]._id;
-        const decodedToken = decodeJwt(token);
-        const userId = decodedToken._id;
-        
         if (!token) {
             console.error('No token found');
             return;
         }
     
-        try {
-            const updatedBoxes = [...boxes];
-            updatedBoxes[currentBoxIndex].color = color;  // Update local state
-            setBoxes(updatedBoxes);
+        const decodedToken = decodeJwt(token);
+        const userId = decodedToken._id;
     
-            // Update color in DB
+        // Ensure the selected box exists
+        if (index < 0 || index >= boxes.length) {
+            console.error('Invalid box index');
+            return;
+        }
+    
+        const selectedBox = boxes[index];
+        const boxId = selectedBox._id;
+    
+        try {
+            // Update local state immediately
+            setBoxes(prevBoxes => 
+                prevBoxes.map((box, i) => 
+                    i === index ? { ...box, color: color, tasks: box.tasks.map(task => ({ ...task, color: color })) } : box
+                )
+            );
+    
+            // Send the updated color to the backend
             const response = await axios.put(
-                `/api/task-boxes/${userId}/${boxId}/color`,
-                { color: color },
-                { headers: { Authorization: `Bearer ${token}` } }
+                `/api/task-boxes/${userId}/${boxId}/color`,  // API endpoint to update box color
+                { color: color },  // Payload containing the new color
+                { headers: { Authorization: `Bearer ${token}` } }  // Authorization header
             );
     
             console.log('API Response:', response.data);
+    
         } catch (error) {
             console.error('Error updating box color:', error.response?.data || error);
         }
-
-        console.log(color)
+    
+        console.log('Selected color:', color);
     };
+    
     
 
     const openBoxModal = (index) => {
