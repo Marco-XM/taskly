@@ -680,7 +680,7 @@ const Taskcards = ({ onCloseModal }) => {
     //         handleDropOnBox(e, dropBoxIndex, dropTaskIndex);
     //     }
     // };
-    const handleDropOnTask = async (e, boxes, dropBoxIndex, dropTaskIndex) => {
+    const handleDropOnTask = async (e, dropBoxIndex, dropTaskIndex) => {
         e.preventDefault();
     
         const dragBoxIndex = parseInt(e.dataTransfer.getData('boxIndex'), 10);
