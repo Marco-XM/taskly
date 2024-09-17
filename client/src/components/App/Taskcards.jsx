@@ -308,7 +308,7 @@ const Taskcards = ({ onCloseModal }) => {
         try {
             // Make the request to update the box
             const response = await axios.put(
-                `/api/task-boxes/${boxId}`, // API route to update a box
+                `/api/task-boxes/${userId}/${boxId}`, // API route to update a box
                 { name: newBoxName }, // Data to update
                 { headers: { Authorization: `Bearer ${token}` } }
             );
