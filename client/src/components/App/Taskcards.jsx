@@ -620,7 +620,7 @@ const Taskcards = ({ onCloseModal }) => {
     
         // Update the state with the new boxes array
         setBoxes(updatedBoxes);
-    
+        
         // Update the database with the new task positions
         try {
             const token = localStorage.getItem('token');
@@ -631,10 +631,11 @@ const Taskcards = ({ onCloseModal }) => {
                 console.error('No token found');
                 return;
             }
-    
+            const boxId = updatedBoxes[dropBoxIndex]._id;
+            const taskId = draggedTask._id;
             // Send the updated task boxes to the backend
             await axios.put(
-                `/api/task-boxes/${userId}/update-tasks`,
+                `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}/update-order`,
                 { boxes: updatedBoxes },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -685,21 +686,17 @@ const Taskcards = ({ onCloseModal }) => {
         const dragBoxIndex = parseInt(e.dataTransfer.getData('boxIndex'), 10);
         const dragTaskIndex = parseInt(e.dataTransfer.getData('taskIndex'), 10);
     
-        // Prevent drop if it's dropped on the same task
         if (dragBoxIndex === dropBoxIndex && dropTaskIndex === dragTaskIndex) {
             return; // No operation if dropped on the same task
         }
     
-        // Prevent drop if it’s moved to the same position
-        if (dragBoxIndex === dropBoxIndex && dragTaskIndex - dropTaskIndex === 1) {
-            return; // No operation if dropped in the same position
-        }
-    
         let updatedBoxes = [...boxes];
-        
+        let draggedTask = null;
+    
         if (dragBoxIndex === dropBoxIndex) {
-            // Moving task within the same box
-            const [draggedTask] = updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
+            // Same box - reordering tasks
+            draggedTask = updatedBoxes[dragBoxIndex].tasks[dragTaskIndex];
+            updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
     
             if (dropTaskIndex >= updatedBoxes[dropBoxIndex].tasks.length) {
                 updatedBoxes[dropBoxIndex].tasks.push(draggedTask);
@@ -709,15 +706,12 @@ const Taskcards = ({ onCloseModal }) => {
                 updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex + 1, 0, draggedTask);
             }
         } else {
-            // Moving task to a different box
-            const [draggedTask] = updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
-            updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex, 0, draggedTask);
+            // Different boxes - moving task between boxes
+            handleDropOnBox()
         }
     
-        // Update local state
         setBoxes(updatedBoxes);
     
-        // Send updated task order to the backend
         try {
             const token = localStorage.getItem('token');
             const decodedToken = decodeJwt(token);
@@ -728,16 +722,22 @@ const Taskcards = ({ onCloseModal }) => {
                 return;
             }
     
-            // Update the database with the new task order
+            // Get the IDs for the task and boxes
+            const boxId = updatedBoxes[dropBoxIndex]._id;
+            const taskId = draggedTask._id;
+    
+            // Update task in database
             await axios.put(
-                `/api/task-boxes/${userId}/update-tasks`,
-                { boxes: updatedBoxes },
+                `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}/update-tasks`,
+                { tasks: updatedBoxes[dropBoxIndex].tasks },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
         } catch (error) {
             console.error('Error updating task positions in database:', error.response?.data || error);
         }
     };
+    
+    
     
     const handleContextMenu = (e, boxIndex, taskIndex) => {
         e.preventDefault();
