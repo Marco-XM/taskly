@@ -243,11 +243,6 @@ const Taskcards = ({ onCloseModal }) => {
             console.error('Error adding task to box:', error.response?.data || error);
         }
     };
-    
-    
-
-    
-    
 
     // const handleAddTask = (taskName) => {
     //     const updatedBoxes = [...boxes];
@@ -276,20 +271,45 @@ const Taskcards = ({ onCloseModal }) => {
         setCurrentTaskIndex(null);
     };
 
-    const handleEditTask = (taskName, startDate = null, endDate = null) => {
+    const handleEditTask = async (taskName, startDate = null, endDate = null) => {
+        const token = localStorage.getItem('token');
+        const decodedToken = decodeJwt(token);
+        const userId = decodedToken._id;
+        
+        if (!token) {
+            console.error('No token found');
+            return; // Handle the error appropriately
+        }
+    
         const updatedBoxes = [...boxes];
         const task = updatedBoxes[currentBoxIndex].tasks[currentTaskIndex];
+        const boxId = updatedBoxes[currentBoxIndex]._id; // Ensure you have the box's `_id`
+        const taskId = task._id; // Ensure you have the task's `_id`
+        closeEditModal();
+
     
         if (task) {
+            // Update the task locally
             task.name = taskName;
             task.startDate = startDate;
             task.endDate = endDate;
         }
     
-        setBoxes(updatedBoxes);
-        localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes)); // Update local storage
-        closeEditModal();
+        try {
+            // Send update to the backend
+            await axios.put(
+                `/api/task-boxes/${boxId}/tasks/${taskId}`, // Adjust this API path as needed
+                { name: taskName, startDate, endDate }, // Data to update
+                { headers: { Authorization: `Bearer ${token}` } } // Send authorization token
+            );
+    
+            // Update the state and UI after the successful update in the database
+            setBoxes(updatedBoxes);
+        } catch (error) {
+            console.error('Error updating task in the database:', error.response?.data || error);
+        }
     };
+    
 
     // const handleEditBox = (newBoxName) => {
     //     const updatedBoxes = [...boxes];
@@ -297,6 +317,7 @@ const Taskcards = ({ onCloseModal }) => {
     //     setBoxes(updatedBoxes);
     //     closeEditBoxModal();
     // };
+
     const handleEditBox = async (newBoxName) => {
         const updatedBoxes = [...boxes];
         updatedBoxes[currentBoxIndex].name = newBoxName;
@@ -318,7 +339,7 @@ const Taskcards = ({ onCloseModal }) => {
             // Make the request to update the box
             const response = await axios.put(
                 `/api/task-boxes/${userId}/${boxId}`, // API route to update a box
-                { name: newBoxName }, // Data to update
+                { name: newBoxName}, // Data to update
                 { headers: { Authorization: `Bearer ${token}` } }
             );
     
@@ -333,7 +354,6 @@ const Taskcards = ({ onCloseModal }) => {
             console.error('Error updating box:', error.response?.data || error);
         }
     };
-    
 
     const removeTask = (boxIndex, taskIndex) => {
         const updatedBoxes = [...boxes];
@@ -365,7 +385,6 @@ const Taskcards = ({ onCloseModal }) => {
             // Optionally, show an error message to the user
         }
     };
-    
 
     const toggleMenu = (index) => {
         setOpenMenuIndex(openMenuIndex === index ? null : index);
