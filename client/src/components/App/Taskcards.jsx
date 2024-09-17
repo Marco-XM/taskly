@@ -219,6 +219,10 @@ const Taskcards = ({ onCloseModal }) => {
                 endDate: endDate ? endDate.toISOString() : null,
                 userId, // Add user ID to the task data
             };
+            const updatedBoxes = [...boxes];
+            updatedBoxes[currentBoxIndex].tasks.push(newTask);
+            setBoxes(updatedBoxes);
+            closeModal(); // Close the modal after adding the task
     
             // Send the new task to the backend
             const response = await axios.post(
@@ -234,7 +238,6 @@ const Taskcards = ({ onCloseModal }) => {
                 box._id === updatedBox._id ? updatedBox : box
             ));
     
-            closeModal(); // Close the modal after adding the task
         } catch (error) {
             console.error('Error adding task to box:', error.response?.data || error);
         }
