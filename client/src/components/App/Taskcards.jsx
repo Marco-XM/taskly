@@ -141,22 +141,38 @@ const Taskcards = ({ onCloseModal }) => {
         navigate('/calendar')
     };
     
-    const updateBoxColor = async (index, color) => {
+    const updateBoxColor = async (color) => {
         const token = localStorage.getItem('token');
-        const boxId = boxes[currentBoxIndex]._id;
-        const decodedToken = decodeJwt(token);
-        const userId = decodedToken._id;
-    
-        // console.log('Box ID:', boxId, 'New Color:', color); // Logging for debugging
-    
         if (!token) {
             console.error('No token found');
             return;
         }
     
+        const decodedToken = decodeJwt(token);
+        const userId = decodedToken._id;
+    
+        // Ensure boxes array and currentBoxIndex are valid
+        if (!boxes || !Array.isArray(boxes) || boxes.length === 0) {
+            console.error('Boxes array is invalid or empty');
+            return;
+        }
+    
+        if (currentBoxIndex < 0 || currentBoxIndex >= boxes.length) {
+            console.error('Invalid box index:', currentBoxIndex);
+            return;
+        }
+    
+        const selectedBox = boxes[currentBoxIndex];
+        if (!selectedBox || !selectedBox._id) {
+            console.error('Selected box is invalid or missing _id');
+            return;
+        }
+    
+        const boxId = selectedBox._id;
+    
         try {
             const updatedBoxes = [...boxes];
-            updatedBoxes[currentBoxIndex].color = color;  // Update local state
+            updatedBoxes[currentBoxIndex].color = color; // Update local state
             setBoxes(updatedBoxes);
     
             // Update color in DB
@@ -170,9 +186,10 @@ const Taskcards = ({ onCloseModal }) => {
         } catch (error) {
             console.error('Error updating box color:', error.response?.data || error);
         }
-
-        console.log(color)
+    
+        console.log('Selected color:', color);
     };
+    
     
 
     const openBoxModal = (index) => {
