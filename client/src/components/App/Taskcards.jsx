@@ -597,31 +597,19 @@ const Taskcards = ({ onCloseModal }) => {
     //     // Update the state with the new boxes array
     //     setBoxes(updatedBoxes);
     // };
-    const handleDropOnBox = async (e, dropBoxIndex, dropTaskIndex) => {
+    const handleDropOnBox = async (e, dropBoxIndex) => {
         e.preventDefault();
     
         const dragBoxIndex = parseInt(e.dataTransfer.getData('boxIndex'), 10);
         const dragTaskIndex = parseInt(e.dataTransfer.getData('taskIndex'), 10);
     
-        // Create a copy of the boxes state
-        const updatedBoxes = [...boxes];
+        let updatedBoxes = [...boxes];
+        let draggedTask = updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1)[0];
     
-        // Get the dragged task
-        const draggedTask = updatedBoxes[dragBoxIndex].tasks[dragTaskIndex];
+        updatedBoxes[dropBoxIndex].tasks.push(draggedTask);
     
-        // Remove the dragged task from its original position
-        updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
-    
-        if (dropTaskIndex !== undefined && dropTaskIndex >= 0) {
-            updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex + 1, 0, draggedTask);
-        } else {
-            updatedBoxes[dropBoxIndex].tasks.unshift(draggedTask);
-        }
-    
-        // Update the state with the new boxes array
         setBoxes(updatedBoxes);
-        
-        // Update the database with the new task positions
+    
         try {
             const token = localStorage.getItem('token');
             const decodedToken = decodeJwt(token);
@@ -631,12 +619,22 @@ const Taskcards = ({ onCloseModal }) => {
                 console.error('No token found');
                 return;
             }
-            const boxId = updatedBoxes[dropBoxIndex]._id;
+    
+            const sourceBoxId = updatedBoxes[dragBoxIndex]._id;
+            const dropBoxId = updatedBoxes[dropBoxIndex]._id;
             const taskId = draggedTask._id;
-            // Send the updated task boxes to the backend
+    
+            // Update task in the source box (remove task)
             await axios.put(
-                `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}/update-order`,
-                { boxes: updatedBoxes },
+                `/api/task-boxes/${userId}/${sourceBoxId}/tasks/${taskId}/remove`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            // Update task in the destination box (add task)
+            await axios.put(
+                `/api/task-boxes/${userId}/${dropBoxId}/tasks/${taskId}/add`,
+                {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );
         } catch (error) {
@@ -686,17 +684,15 @@ const Taskcards = ({ onCloseModal }) => {
         const dragBoxIndex = parseInt(e.dataTransfer.getData('boxIndex'), 10);
         const dragTaskIndex = parseInt(e.dataTransfer.getData('taskIndex'), 10);
     
+        // No operation if dropped on the same task
         if (dragBoxIndex === dropBoxIndex && dropTaskIndex === dragTaskIndex) {
-            return; // No operation if dropped on the same task
+            return;
         }
     
-        let updatedBoxes = [...boxes];
-        let draggedTask = null;
-    
+        // Handle reordering tasks within the same box
         if (dragBoxIndex === dropBoxIndex) {
-            // Same box - reordering tasks
-            draggedTask = updatedBoxes[dragBoxIndex].tasks[dragTaskIndex];
-            updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
+            const updatedBoxes = [...boxes];
+            const [draggedTask] = updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
     
             if (dropTaskIndex >= updatedBoxes[dropBoxIndex].tasks.length) {
                 updatedBoxes[dropBoxIndex].tasks.push(draggedTask);
@@ -705,37 +701,38 @@ const Taskcards = ({ onCloseModal }) => {
             } else {
                 updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex + 1, 0, draggedTask);
             }
-        } else {
-            // Different boxes - moving task between boxes
-            handleDropOnBox()
-        }
     
-        setBoxes(updatedBoxes);
+            setBoxes(updatedBoxes);
     
-        try {
-            const token = localStorage.getItem('token');
-            const decodedToken = decodeJwt(token);
-            const userId = decodedToken._id;
+            // Update the database with the new task positions
+            try {
+                const token = localStorage.getItem('token');
+                const decodedToken = decodeJwt(token);
+                const userId = decodedToken._id;
     
-            if (!token) {
-                console.error('No token found');
-                return;
+                if (!token) {
+                    console.error('No token found');
+                    return;
+                }
+    
+                const boxId = updatedBoxes[dropBoxIndex]._id;
+                const taskId = draggedTask._id;
+    
+                await axios.put(
+                    `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}/update-order`,
+                    { tasks: updatedBoxes[dropBoxIndex].tasks },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+            } catch (error) {
+                console.error('Error updating task positions in database:', error.response?.data || error);
             }
-    
-            // Get the IDs for the task and boxes
-            const boxId = updatedBoxes[dropBoxIndex]._id;
-            const taskId = draggedTask._id;
-    
-            // Update task in database
-            await axios.put(
-                `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}/update-tasks`,
-                { tasks: updatedBoxes[dropBoxIndex].tasks },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-        } catch (error) {
-            console.error('Error updating task positions in database:', error.response?.data || error);
+        } else {
+            // Call handleDropOnBox if moving to a different box
+            handleDropOnBox(e, dropBoxIndex);
         }
     };
+    
+    
     
     
     
