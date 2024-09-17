@@ -111,7 +111,7 @@ const Taskcards = ({ onCloseModal }) => {
         const decodedToken = decodeJwt(token);
         const userId = decodedToken._id;
     
-        console.log('Box ID:', boxId, 'New Color:', color); // Logging for debugging
+        // console.log('Box ID:', boxId, 'New Color:', color); // Logging for debugging
     
         if (!token) {
             console.error('No token found');
@@ -705,7 +705,7 @@ const Taskcards = ({ onCloseModal }) => {
                     </button>
                 </div>
                 <div className='p-5 rounded-2xl'
-                key={box._id}
+                key={index}
                 style={{backgroundColor: `${box.color}`}}
                 >
                 <Draghere
