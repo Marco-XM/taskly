@@ -298,7 +298,7 @@ const Taskcards = ({ onCloseModal }) => {
         updatedBoxes[currentBoxIndex].name = newBoxName;
         setBoxes(updatedBoxes); // Optimistically update UI
         closeEditBoxModal(); // Close the edit box modal after successful update
-        
+
         const token = localStorage.getItem('token');
         const decodedToken = decodeJwt(token);
         const userId = decodedToken._id;
@@ -337,10 +337,34 @@ const Taskcards = ({ onCloseModal }) => {
         setBoxes(updatedBoxes);
     };
 
-    const removeBox = (boxIndex) => {
+    const removeBox = async (boxIndex) => {
         const updatedBoxes = [...boxes];
         updatedBoxes.splice(boxIndex, 1);
-        setBoxes(updatedBoxes)
+        setBoxes(updatedBoxes);
+
+        const token = localStorage.getItem('token');
+        const decodedToken = decodeJwt(token);
+        const userId = decodedToken._id;
+
+        if(!token) {
+            console.error('No token found');
+            return;
+        }
+
+        const boxId = boxes[currentBoxIndex]._id; // Get the ID of the box to be updated
+    
+        try {
+            // Make the request to update the box
+            await axios.delete(
+                `/api/task-boxes/${userId}/${boxId}`, // API route to delete a box
+                { headers: { Authorization: `Bearer ${token}` } }
+            );    
+        } catch (error) {
+            console.error('Error deleting box:',error);
+
+            setBoxes(prevBoxes => [...prevBoxes.slice(0, boxIndex), boxes[boxIndex], ...prevBoxes.slice(boxIndex + 1)]);
+
+        }
     };
 
     const toggleMenu = (index) => {
@@ -510,11 +534,6 @@ const Taskcards = ({ onCloseModal }) => {
             document.removeEventListener('click', handleClickOutside);
         };
     },);
-
-
-// =======================================
-// const [taskDates, setTaskDates] = useState({});
-// =======================================
     
     const renderTaskCards = () => (
         <>
