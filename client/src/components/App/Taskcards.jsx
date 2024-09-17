@@ -710,8 +710,8 @@ const Taskcards = ({ onCloseModal }) => {
             }
         } else {
             // Moving task to a different box
-            handleDropOnBox(e, dropBoxIndex, dropTaskIndex);
-
+            const [draggedTask] = updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
+            updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex, 0, draggedTask);
         }
     
         // Update local state
