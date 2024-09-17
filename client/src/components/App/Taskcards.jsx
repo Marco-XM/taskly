@@ -34,11 +34,12 @@ const Taskcards = ({ onCloseModal }) => {
         { name: 'Processing', tasks: [], color: 'yellow'},
         { name: 'Completed', tasks: [], color: '#6ee7b7'},
     ];
-    // const [boxes, setBoxes] = useState(() => {
-    //     const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
-    //     return savedBoxes || initialBoxes;
-    // });
-    const [boxes, setBoxes] = useState([]);
+    const [boxes, setBoxes] = useState(() => {
+        const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
+        return savedBoxes || initialBoxes;
+    });
+
+    // const [boxes, setBoxes] = useState([]);
 
     // Save boxes and taskDates to local storage
     useEffect(() => {
@@ -596,19 +597,31 @@ const Taskcards = ({ onCloseModal }) => {
     //     // Update the state with the new boxes array
     //     setBoxes(updatedBoxes);
     // };
-    const handleDropOnBox = async (e, dropBoxIndex) => {
+    const handleDropOnBox = async (e, dropBoxIndex, dropTaskIndex) => {
         e.preventDefault();
     
         const dragBoxIndex = parseInt(e.dataTransfer.getData('boxIndex'), 10);
         const dragTaskIndex = parseInt(e.dataTransfer.getData('taskIndex'), 10);
     
-        let updatedBoxes = [...boxes];
-        let draggedTask = updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1)[0];
+        // Create a copy of the boxes state
+        const updatedBoxes = [...boxes];
     
-        updatedBoxes[dropBoxIndex].tasks.push(draggedTask);
+        // Get the dragged task
+        const draggedTask = updatedBoxes[dragBoxIndex].tasks[dragTaskIndex];
     
+        // Remove the dragged task from its original position
+        updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
+    
+        if (dropTaskIndex !== undefined && dropTaskIndex >= 0) {
+            updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex + 1, 0, draggedTask);
+        } else {
+            updatedBoxes[dropBoxIndex].tasks.unshift(draggedTask);
+        }
+    
+        // Update the state with the new boxes array
         setBoxes(updatedBoxes);
-    
+        
+        // Update the database with the new task positions
         try {
             const token = localStorage.getItem('token');
             const decodedToken = decodeJwt(token);
@@ -618,22 +631,12 @@ const Taskcards = ({ onCloseModal }) => {
                 console.error('No token found');
                 return;
             }
-    
-            const sourceBoxId = updatedBoxes[dragBoxIndex]._id;
-            const dropBoxId = updatedBoxes[dropBoxIndex]._id;
-            const taskId = draggedTask._id;
-    
-            // Update task in the source box (remove task)
+                const boxId = updatedBoxes[dropBoxIndex]._id;
+                const taskId = draggedTask._id;
+            // Send the updated task boxes to the backend
             await axios.put(
-                `/api/task-boxes/${userId}/${sourceBoxId}/tasks/${taskId}/remove`,
-                {},
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-    
-            // Update task in the destination box (add task)
-            await axios.put(
-                `/api/task-boxes/${userId}/${dropBoxId}/tasks/${taskId}/add`,
-                {},
+                `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}/update-order`,
+                { boxes: updatedBoxes },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
         } catch (error) {
@@ -683,54 +686,56 @@ const Taskcards = ({ onCloseModal }) => {
         const dragBoxIndex = parseInt(e.dataTransfer.getData('boxIndex'), 10);
         const dragTaskIndex = parseInt(e.dataTransfer.getData('taskIndex'), 10);
     
-        // No operation if dropped on the same task
         if (dragBoxIndex === dropBoxIndex && dropTaskIndex === dragTaskIndex) {
-            return;
+            return; // No operation if dropped on the same task
         }
     
-        // Handle reordering tasks within the same box
+        let updatedBoxes = [...boxes];
+        let draggedTask = null;
+    
         if (dragBoxIndex === dropBoxIndex) {
-            const updatedBoxes = [...boxes];
-            const [draggedTask] = updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
+            // Same box - reordering tasks
+            draggedTask = updatedBoxes[dragBoxIndex].tasks[dragTaskIndex];
+            updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
     
-            if (dropTaskIndex >= updatedBoxes[dropBoxIndex].tasks.length) {
-                updatedBoxes[dropBoxIndex].tasks.push(draggedTask);
+            if (dropTaskIndex >= updatedBoxes[dragBoxIndex].tasks.length) {
+                updatedBoxes[dragBoxIndex].tasks.push(draggedTask);
             } else if (dragTaskIndex < dropTaskIndex) {
-                updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex, 0, draggedTask);
+                updatedBoxes[dragBoxIndex].tasks.splice(dropTaskIndex, 0, draggedTask);
             } else {
-                updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex + 1, 0, draggedTask);
-            }
-    
-            setBoxes(updatedBoxes);
-    
-            // Update the database with the new task positions
-            try {
-                const token = localStorage.getItem('token');
-                const decodedToken = decodeJwt(token);
-                const userId = decodedToken._id;
-    
-                if (!token) {
-                    console.error('No token found');
-                    return;
-                }
-    
-                const boxId = updatedBoxes[dropBoxIndex]._id;
-                const taskId = draggedTask._id;
-    
-                await axios.put(
-                    `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}/update-order`,
-                    { tasks: updatedBoxes[dropBoxIndex].tasks },
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-            } catch (error) {
-                console.error('Error updating task positions in database:', error.response?.data || error);
+                updatedBoxes[dragBoxIndex].tasks.splice(dropTaskIndex + 1, 0, draggedTask);
             }
         } else {
-            // Call handleDropOnBox if moving to a different box
-            handleDropOnBox(e, dropBoxIndex);
+            // Different boxes - moving task between boxes
+            handleDropOnBox();
+        }
+    
+        setBoxes(updatedBoxes);
+    
+        try {
+            const token = localStorage.getItem('token');
+            const decodedToken = decodeJwt(token);
+            const userId = decodedToken._id;
+    
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
+    
+            // Get the IDs for the task and boxes
+            const dropBoxId = updatedBoxes[dropBoxIndex]._id;
+            const taskId = draggedTask._id;
+    
+            // Update task in the database
+            await axios.put(
+                `/api/task-boxes/${userId}/${dropBoxId}/tasks/${taskId}/update-order`,
+                { tasks: updatedBoxes[dropBoxIndex].tasks },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        } catch (error) {
+            console.error('Error updating task positions in database:', error.response?.data || error);
         }
     };
-    
     
     
     
