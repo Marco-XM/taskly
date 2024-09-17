@@ -53,7 +53,7 @@ const Taskcards = ({ onCloseModal }) => {
                     headers: { Authorization: `Bearer ${token}` }
                 });
     
-                setBoxes(response.data);
+                setBoxes(response.data.boxes);
             } catch (error) {
                 console.error('Error fetching task boxes:', error.response?.data || error);
             }
