@@ -29,11 +29,11 @@ const Taskcards = ({ onCloseModal }) => {
     const navigate = useNavigate();
     
 
-    const initialBoxes  = [
-        { name: 'Pending', tasks: [], color: 'red'},
-        { name: 'Processing', tasks: [], color: 'yellow'},
-        { name: 'Completed', tasks: [], color: '#6ee7b7'},
-    ];
+    // const initialBoxes  = [
+    //     { name: 'Pending', tasks: [], color: 'red'},
+    //     { name: 'Processing', tasks: [], color: 'yellow'},
+    //     { name: 'Completed', tasks: [], color: '#6ee7b7'},
+    // ];
     // const [boxes, setBoxes] = useState(() => {
     //     const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
     //     return savedBoxes || initialBoxes;
@@ -596,16 +596,23 @@ const Taskcards = ({ onCloseModal }) => {
     //     // Update the state with the new boxes array
     //     setBoxes(updatedBoxes);
     // };
-    const handleDropOnBox = async (e, dropBoxIndex) => {
+    const handleDropOnBox = async (e, dropBoxIndex, dropTaskIndex) => {
         e.preventDefault();
     
         const dragBoxIndex = parseInt(e.dataTransfer.getData('boxIndex'), 10);
         const dragTaskIndex = parseInt(e.dataTransfer.getData('taskIndex'), 10);
     
-        let updatedBoxes = [...boxes];
-        let draggedTask = updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1)[0];
+        const updatedBoxes = { ...boxes };
+        const draggedTask = updatedBoxes[dragBoxIndex].tasks[dragTaskIndex];
     
-        updatedBoxes[dropBoxIndex].tasks.push(draggedTask);
+        // Remove the dragged task from its original position
+        updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
+    
+        if (dropTaskIndex !== undefined && dropTaskIndex >= 0) {
+            updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex + 1, 0, draggedTask);
+        } else {
+            updatedBoxes[dropBoxIndex].tasks.unshift(draggedTask);
+        }
     
         setBoxes(updatedBoxes);
     
@@ -619,27 +626,17 @@ const Taskcards = ({ onCloseModal }) => {
                 return;
             }
     
-            const sourceBoxId = updatedBoxes[dragBoxIndex]._id;
-            const dropBoxId = updatedBoxes[dropBoxIndex]._id;
-            const taskId = draggedTask._id;
-    
-            // Update task in the source box (remove task)
+            // Send the updated boxes to the backend
             await axios.put(
-                `/api/task-boxes/${userId}/${sourceBoxId}/tasks/${taskId}/remove`,
-                {},
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-    
-            // Update task in the destination box (add task)
-            await axios.put(
-                `/api/task-boxes/${userId}/${dropBoxId}/tasks/${taskId}/add`,
-                {},
+                `/api/task-boxes/${userId}/update-task-positions`,
+                { boxes: updatedBoxes },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
         } catch (error) {
             console.error('Error updating task positions in database:', error.response?.data || error);
         }
     };
+    
     
     const handleDragOver = (e) => {
         e.preventDefault();
