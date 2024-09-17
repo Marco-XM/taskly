@@ -108,29 +108,35 @@ const Taskcards = ({ onCloseModal }) => {
 
     const handleColorChange = async (color) => {
         const token = localStorage.getItem('token');
-        const decodedToken = decodeJwt(token); // Assuming decodeJwt correctly decodes the token
+        const boxId = boxes[currentBoxIndex]._id;
+        const decodedToken = decodeJwt(token);
         const userId = decodedToken._id;
-        const boxId = boxes[currentBoxIndex]._id
-
+    
+        console.log('Box ID:', boxId, 'New Color:', color); // Logging for debugging
+    
         if (!token) {
-            console.error('No Token Found');
+            console.error('No token found');
             return;
         }
+    
         try {
             const updatedBoxes = [...boxes];
-            updatedBoxes[currentBoxIndex].color = color;
-            setBoxes[updatedBoxes];
-
-            await axios.put(
-                `api/task-boxes/${userId}/${boxId}/color`,
+            updatedBoxes[currentBoxIndex].color = color;  // Update local state
+            setBoxes(updatedBoxes);
+    
+            // Update color in DB
+            const response = await axios.put(
+                `/api/task-boxes/${userId}/${boxId}/color`,
                 { color: color },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
+    
+            console.log('API Response:', response.data);
         } catch (error) {
-            console.error('Error Updating Box Color: ', error.response?.data || error);
+            console.error('Error updating box color:', error.response?.data || error);
         }
-        setSelectedColor(color);
     };
+    
 
     const handlenavigate = () => {
         navigate('/calendar')
@@ -819,7 +825,7 @@ const Taskcards = ({ onCloseModal }) => {
                     onClose={closeBoxModal}
                     onSubmit={addNewBox}
                     />
-                    <ColorPicker onColorChange={handleColorChange}/>
+                    <ColorPicker onColorChange={handleColorChange} initialColor={boxes[currentBoxIndex]?.color || '#aabbcc'} />
                 </div>
             )}
         </div>
