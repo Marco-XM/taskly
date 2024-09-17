@@ -298,6 +298,7 @@ const Taskcards = ({ onCloseModal }) => {
         const decodedToken = decodeJwt(token);
         const userId = decodedToken._id;
         
+        
         if (!token) {
             console.error('No token found');
             return; // Handle the error appropriately
@@ -369,11 +370,37 @@ const Taskcards = ({ onCloseModal }) => {
         }
     };
 
-    const removeTask = (boxIndex, taskIndex) => {
-        const updatedBoxes = [...boxes];
-        updatedBoxes[boxIndex].tasks.splice(taskIndex, 1);
-        setBoxes(updatedBoxes);
+    const removeTask = async (boxIndex, taskIndex) => {
+        const token = localStorage.getItem('token');
+        const boxId = boxes[boxIndex]._id;
+        const taskId = boxes[boxIndex].tasks[taskIndex]._id;
+        const decodedToken = decodeJwt(token);
+        const userId = decodedToken._id;
+
+    
+        if (!token) {
+            console.error('No token found');
+            return; // Handle error appropriately, e.g., redirect to login
+        }
+    
+        try {
+            // Update the local state first for a snappy UI response
+            const updatedBoxes = [...boxes];
+            updatedBoxes[boxIndex].tasks.splice(taskIndex, 1);
+            setBoxes(updatedBoxes);
+    
+            // Now make the API call to remove the task from the database
+            await axios.delete(
+                `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+        } catch (error) {
+            console.error('Error removing task:', error.response?.data || error);
+            // Optionally: Revert state changes in case of error
+        }
     };
+    
 
     const removeBox = async (boxIndex) => {
         const boxId = boxes[boxIndex]._id; // Get the ID of the box to be removed
