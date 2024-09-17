@@ -631,10 +631,11 @@ const Taskcards = ({ onCloseModal }) => {
                 console.error('No token found');
                 return;
             }
-    
+            const dropBoxId = updatedBoxes[dropBoxIndex]._id;
+            const taskId = draggedTask._id;
             // Send the updated task boxes to the backend
             await axios.put(
-                `/api/task-boxes/${userId}/update-tasks`,
+                `/api/task-boxes/${userId}/${dropBoxId}/tasks/${taskId}/add`,
                 { boxes: updatedBoxes },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
