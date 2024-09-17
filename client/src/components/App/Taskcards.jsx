@@ -607,12 +607,7 @@ const Taskcards = ({ onCloseModal }) => {
         const updatedBoxes = [...boxes];
     
         // Get the dragged task
-        const draggedTask = updatedBoxes[dragBoxIndex]?.tasks?.[dragTaskIndex];
-    
-        if (!draggedTask) {
-            console.error('Dragged task not found');
-            return;
-        }
+        const draggedTask = updatedBoxes[dragBoxIndex].tasks[dragTaskIndex];
     
         // Remove the dragged task from its original position
         updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
@@ -625,28 +620,22 @@ const Taskcards = ({ onCloseModal }) => {
     
         // Update the state with the new boxes array
         setBoxes(updatedBoxes);
-        
+    
         // Update the database with the new task positions
         try {
             const token = localStorage.getItem('token');
             const decodedToken = decodeJwt(token);
-            const userId = decodedToken?._id;
+            const userId = decodedToken._id;
     
             if (!token) {
                 console.error('No token found');
                 return;
             }
     
-            const boxId = updatedBoxes[dropBoxIndex]?._id;
-            if (!boxId || !draggedTask._id) {
-                console.error('Invalid box or task ID');
-                return;
-            }
-    
-            // Send the updated task box to the backend
+            // Send the updated task boxes to the backend
             await axios.put(
-                `/api/task-boxes/${userId}/${boxId}/tasks/${draggedTask._id}/update-order`,
-                { tasks: updatedBoxes[dropBoxIndex].tasks },
+                `/api/task-boxes/${userId}/update-tasks`,
+                { boxes: updatedBoxes },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
         } catch (error) {
