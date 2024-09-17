@@ -23,6 +23,7 @@ const Taskcards = ({ onCloseModal }) => {
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
     const [boxModalOpen, setBoxModalOpen] = useState(null);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+    const [selectedColor, setSelectedColor] = useState("#aabbcc");
     const [dragImage, setDragImage] = useState(null);
     const editFormRef = useRef(null);
     const navigate = useNavigate();
@@ -106,36 +107,8 @@ const Taskcards = ({ onCloseModal }) => {
 
 
     const handleColorChange = async (color) => {
-        const token = localStorage.getItem('token');
-        const boxId = boxes[currentBoxIndex]._id;
-        const decodedToken = decodeJwt(token);
-        const userId = decodedToken._id;
-    
-        // console.log('Box ID:', boxId, 'New Color:', color); // Logging for debugging
-    
-        if (!token) {
-            console.error('No token found');
-            return;
-        }
-    
-        try {
-            const updatedBoxes = [...boxes];
-            updatedBoxes[currentBoxIndex].color = color;  // Update local state
-            setBoxes(updatedBoxes);
-    
-            // Update color in DB
-            const response = await axios.put(
-                `/api/task-boxes/${userId}/${boxId}/color`,
-                { color: color },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-    
-            console.log('API Response:', response.data);
-        } catch (error) {
-            console.error('Error updating box color:', error.response?.data || error);
-        }
+        setSelectedColor(color);
     };
-    
 
     const handlenavigate = () => {
         navigate('/calendar')
@@ -189,7 +162,6 @@ const Taskcards = ({ onCloseModal }) => {
     
         console.log('Selected color:', color);
     };
-    
     
 
     const openBoxModal = (index) => {
@@ -747,6 +719,7 @@ const Taskcards = ({ onCloseModal }) => {
                 <div className='p-5 rounded-2xl'
                 key={index}
                 style={{backgroundColor: `${box.color}`}}
+                color={box.color}
                 >
                 <Draghere
                     key={index}
@@ -863,7 +836,7 @@ const Taskcards = ({ onCloseModal }) => {
                     onClose={closeBoxModal}
                     onSubmit={addNewBox}
                     />
-                    <ColorPicker onColorChange={handleColorChange} initialColor={boxes[currentBoxIndex]?.color || '#aabbcc'} />
+                    <ColorPicker onColorChange={handleColorChange}/>
                 </div>
             )}
         </div>
