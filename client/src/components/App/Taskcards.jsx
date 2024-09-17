@@ -729,7 +729,7 @@ const Taskcards = ({ onCloseModal }) => {
             // Update task in the database
             await axios.put(
                 `/api/task-boxes/${userId}/${dropBoxId}/tasks/${taskId}/update-order`,
-                { tasks: updatedBoxes[dropBoxIndex].tasks },
+                { boxes: updatedBoxes },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
         } catch (error) {
