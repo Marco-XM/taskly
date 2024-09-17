@@ -75,17 +75,11 @@ const Taskcards = ({ onCloseModal }) => {
         const token = localStorage.getItem('token');
         const decodedToken = decodeJwt(token); // Assuming decodeJwt correctly decodes the token
         const userId = decodedToken._id;
-    
+
         if (!token) {
             console.error('No token found');
             return;
         }
-    
-        // Optimistically update the UI
-        const newBox = { name: boxName, color: selectedColor, _id: 'temp-id' }; // Temporary ID for optimistic update
-        const updatedBoxes = [...boxes, newBox];
-        setBoxes(updatedBoxes);
-        closeBoxModal();
     
         try {
             const response = await axios.post(
@@ -93,23 +87,16 @@ const Taskcards = ({ onCloseModal }) => {
                 { name: boxName, color: selectedColor }, // Only send name and color
                 { headers: { Authorization: `Bearer ${token}` } } // Attach the token
             );
+            
     
             const savedBox = response.data;
-    
-            // Replace the temporary ID with the actual ID from the response
-            setBoxes(prevBoxes => 
-                prevBoxes.map(box => 
-                    box._id === 'temp-id' ? savedBox : box
-                )
-            );
+            const updatedBoxes = [...boxes, savedBox];
+            setBoxes(updatedBoxes);
+            closeBoxModal();
         } catch (error) {
             console.error('Error adding new box:', error.response?.data || error);
-    
-            // Optionally remove the temporary box from the UI if the request fails
-            setBoxes(prevBoxes => prevBoxes.filter(box => box._id !== 'temp-id'));
         }
     };
-    
     
 
     const generateId = () => {
