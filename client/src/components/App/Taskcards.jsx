@@ -38,82 +38,67 @@ const Taskcards = ({ onCloseModal }) => {
         const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
         return savedBoxes || initialBoxes;
     });
-    useEffect(() => {
-        const loadBoxes = async () => {
-            try {
-                const response = await axios.get('/api/task-boxes', {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                });
-                const boxes = response.data;
-                localStorage.setItem('taskBoxes', JSON.stringify(boxes));
-                setBoxes(boxes);
-            } catch (error) {
-                console.error('Error loading boxes from database:', error);
-            }
-        };
 
-        loadBoxes();
-    }, []);
     // const [boxes, setBoxes] = useState([]);
 
     // Save boxes and taskDates to local storage
-    // useEffect(() => {
-    //     const fetchTaskBoxes = async () => {
-    //         const token = localStorage.getItem('token');
-    //         const decodedToken = decodeJwt(token); // Assuming decodeJwt correctly decodes the token
-    //         const userId = decodedToken._id;
-    //         if (!token) {
-    //             console.error('No token found');
-    //             return;
-    //         }
+    useEffect(() => {
+        const fetchTaskBoxes = async () => {
+            const token = localStorage.getItem('token');
+            const decodedToken = decodeJwt(token); // Assuming decodeJwt correctly decodes the token
+            const userId = decodedToken._id;
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
 
-    //         try {
-    //             const response = await axios.get(`/api/task-boxes/${userId}`, {
-    //                 headers: { Authorization: `Bearer ${token}` }
-    //             });
-    //             setBoxes(response.data); // Set the state with the fetched data
-    //         } catch (error) {
-    //             console.error('Error fetching task boxes:', error.response?.data || error);
-    //         }
-    //     };
+            try {
+                const response = await axios.get(`/api/task-boxes/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setBoxes(response.data); // Set the state with the fetched data
+            } catch (error) {
+                console.error('Error fetching task boxes:', error.response?.data || error);
+            }
+        };
 
-    //     fetchTaskBoxes();
-    // }, []); // Run only on component mount
+        fetchTaskBoxes();
+    }, []); // Run only on component mount
 
     // Save task boxes to localStorage whenever they change
     useEffect(() => {
         localStorage.setItem('taskBoxes', JSON.stringify(boxes));
     }, [boxes]);
-    const addNewBox = (boxName) => {
-        const updatedBoxes = [...boxes, { name: boxName, tasks: [], color: selectedColor}];
-        setBoxes(updatedBoxes);
-        closeBoxModal();
-    };
-    // const addNewBox = async (boxName) => {
-    //     const token = localStorage.getItem('token');
-    //     const decodedToken = decodeJwt(token); // Assuming decodeJwt correctly decodes the token
-    //     const userId = decodedToken._id;
-
-    //     if (!token) {
-    //         console.error('No token found');
-    //         return;
-    //     }
-    
-    //     try {
-    //         const response = await axios.post(
-    //             `/api/task-boxes/${userId}`,
-    //             { name: boxName, color: selectedColor }, // Only send name and color
-    //             { headers: { Authorization: `Bearer ${token}` } } // Attach the token
-    //         );
-    
-    //         const savedBox = response.data;
-    //         const updatedBoxes = [...boxes, savedBox];
-    //         setBoxes(updatedBoxes);
-    //         closeBoxModal();
-    //     } catch (error) {
-    //         console.error('Error adding new box:', error.response?.data || error);
-    //     }
+    // const addNewBox = (boxName) => {
+    //     const updatedBoxes = [...boxes, { name: boxName, tasks: [], color: selectedColor}];
+    //     setBoxes(updatedBoxes);
+    //     closeBoxModal();
     // };
+    const addNewBox = async (boxName) => {
+        const token = localStorage.getItem('token');
+        const decodedToken = decodeJwt(token); // Assuming decodeJwt correctly decodes the token
+        const userId = decodedToken._id;
+
+        if (!token) {
+            console.error('No token found');
+            return;
+        }
+    
+        try {
+            const response = await axios.post(
+                `/api/task-boxes/${userId}`,
+                { name: boxName, color: selectedColor }, // Only send name and color
+                { headers: { Authorization: `Bearer ${token}` } } // Attach the token
+            );
+    
+            const savedBox = response.data;
+            const updatedBoxes = [...boxes, savedBox];
+            setBoxes(updatedBoxes);
+            closeBoxModal();
+        } catch (error) {
+            console.error('Error adding new box:', error.response?.data || error);
+        }
+    };
     
 
     const generateId = () => {
@@ -176,23 +161,23 @@ const Taskcards = ({ onCloseModal }) => {
         onCloseModal && onCloseModal();
     };
 
-    const handleAddTask = (taskName, startDate = null, endDate = null) => {
-        const updatedBoxes = [...boxes];
+    // const handleAddTask = (taskName, startDate = null, endDate = null) => {
+    //     const updatedBoxes = [...boxes];
     
-        const newTask = {
-            id: generateId(),
-            name: taskName,
-            startDate: startDate ? startDate.toISOString().split('T')[0] : null,
-            endDate: endDate ? endDate.toISOString().split('T')[0] : null,
-        };
+    //     const newTask = {
+    //         id: generateId(),
+    //         name: taskName,
+    //         startDate: startDate ? startDate.toISOString().split('T')[0] : null,
+    //         endDate: endDate ? endDate.toISOString().split('T')[0] : null,
+    //     };
     
-        updatedBoxes[currentBoxIndex].tasks.push(newTask);
+    //     updatedBoxes[currentBoxIndex].tasks.push(newTask);
     
-        setBoxes(updatedBoxes);
-        localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
+    //     setBoxes(updatedBoxes);
+    //     localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
     
-        closeModal();
-    };
+    //     closeModal();
+    // };`
 
 
     const base64UrlDecode = (str) => {
@@ -217,45 +202,45 @@ const Taskcards = ({ onCloseModal }) => {
         return JSON.parse(decodedPayload);
     };
     
-    // const handleAddTask = async (taskName, startDate = null, endDate = null, boxId) => {
-    //     const token = localStorage.getItem('token');
-    //     const decodedToken = decodeJwt(token);
-    //     const userId = decodedToken._id;
-    //     if (!token) {
-    //         console.error('No token found');
-    //         return; // Handle error appropriately, e.g., redirect to login
-    //     }
-    //     const id = generateId();
-    //     try {
-    //         const newTask = {
-    //             name: taskName,
-    //             startDate: startDate ? startDate.toISOString().split('T')[0] : null,
-    //             endDate: endDate ? endDate.toISOString().split('T')[0] : null,
-    //             userId: userId, // Add user ID to the task data
-    //         };
+    const handleAddTask = async (taskName, startDate = null, endDate = null, boxId) => {
+        const token = localStorage.getItem('token');
+        const decodedToken = decodeJwt(token);
+        const userId = decodedToken._id;
+        if (!token) {
+            console.error('No token found');
+            return; // Handle error appropriately, e.g., redirect to login
+        }
+        const id = generateId();
+        try {
+            const newTask = {
+                name: taskName,
+                startDate: startDate ? startDate.toISOString().split('T')[0] : null,
+                endDate: endDate ? endDate.toISOString().split('T')[0] : null,
+                userId: userId, // Add user ID to the task data
+            };
     
-    //         // Update local state and local storage first
-    //         const updatedBoxes = [...boxes];
-    //         updatedBoxes[currentBoxIndex].tasks.push(newTask);
-    //         closeModal();
+            // Update local state and local storage first
+            const updatedBoxes = [...boxes];
+            updatedBoxes[currentBoxIndex].tasks.push(newTask);
+            closeModal();
     
-    //         setBoxes(updatedBoxes);
-    //         localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
+            setBoxes(updatedBoxes);
+            localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
     
-    //         // Now send the new task to the backend
-    //         const response = await axios.post(
-    //             `/api/task-boxes/${boxId}/tasks`, // API route to add a task to a box
-    //             { id: id, name: taskName, startDate: startDate, endDate: endDate }, // Task data
-    //             { headers: { Authorization: `Bearer ${token}` } }
-    //         );
-    //         const updatedBox = response.data;
+            // Now send the new task to the backend
+            const response = await axios.post(
+                `/api/task-boxes/${boxId}/tasks`, // API route to add a task to a box
+                { id: id, name: taskName, startDate: startDate, endDate: endDate }, // Task data
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            const updatedBox = response.data;
 
-    //             // Handle success if needed
-    //             setBoxes(prevBoxes => prevBoxes.map(box => (box._id === updatedBox._id ? updatedBox : box)));
-    //         } catch (error) {
-    //             console.error('Error adding task to box:', error.response?.data || error);
-    //         }
-    // };
+                // Handle success if needed
+                setBoxes(prevBoxes => prevBoxes.map(box => (box._id === updatedBox._id ? updatedBox : box)));
+            } catch (error) {
+                console.error('Error adding task to box:', error.response?.data || error);
+            }
+    };
     
 
     
