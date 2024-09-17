@@ -225,6 +225,7 @@ const Taskcards = ({ onCloseModal }) => {
     
             setBoxes(updatedBoxes);
             localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
+            closeModal();
     
             // Now send the new task to the backend
             const response = await axios.post(
@@ -239,7 +240,6 @@ const Taskcards = ({ onCloseModal }) => {
             } catch (error) {
                 console.error('Error adding task to box:', error.response?.data || error);
             }
-            closeModal();
     };
     
 
