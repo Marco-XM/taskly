@@ -287,12 +287,45 @@ const Taskcards = ({ onCloseModal }) => {
         closeEditModal();
     };
 
-    const handleEditBox = (newBoxName) => {
-        const updatedBoxes = [...boxes];
-        updatedBoxes[currentBoxIndex].name = newBoxName;
-        setBoxes(updatedBoxes);
-        closeEditBoxModal();
+    // const handleEditBox = (newBoxName) => {
+    //     const updatedBoxes = [...boxes];
+    //     updatedBoxes[currentBoxIndex].name = newBoxName;
+    //     setBoxes(updatedBoxes);
+    //     closeEditBoxModal();
+    // };
+    const handleEditBox = async (newBoxName) => {
+        const token = localStorage.getItem('token');
+        const decodedToken = decodeJwt(token);
+        const userId = decodedToken._id;
+    
+        if (!token) {
+            console.error('No token found');
+            return; // Handle error appropriately, e.g., redirect to login
+        }
+    
+        const boxId = boxes[currentBoxIndex]._id; // Get the ID of the box to be updated
+    
+        try {
+            // Make the request to update the box
+            const response = await axios.put(
+                `/api/task-boxes/${boxId}`, // API route to update a box
+                { name: newBoxName }, // Data to update
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            const updatedBox = response.data;
+    
+            // Update the local state based on the response from the backend
+            setBoxes(prevBoxes => prevBoxes.map(box => 
+                box._id === updatedBox._id ? updatedBox : box
+            ));
+    
+            closeEditBoxModal(); // Close the edit box modal after successful update
+        } catch (error) {
+            console.error('Error updating box:', error.response?.data || error);
+        }
     };
+    
 
     const removeTask = (boxIndex, taskIndex) => {
         const updatedBoxes = [...boxes];
