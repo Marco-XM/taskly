@@ -202,18 +202,16 @@ const Taskcards = ({ onCloseModal }) => {
         return JSON.parse(decodedPayload);
     };
     
-    const handleAddTask = async (taskName, startDate = null, endDate = null) => {
+    const handleAddTask = async (boxId ,taskName, startDate = null, endDate = null) => {
         const token = localStorage.getItem('token');
+        const decodedToken = decodeJwt(token);
+        const userId = decodedToken._id;
         if (!token) {
             console.error('No token found');
             return; // Handle error appropriately, e.g., redirect to login
         }
-    
+        const id = generateId();
         try {
-            // Decode the JWT to get the payload
-            const decodedToken = decodeJwt(token);
-            const userId = decodedToken._id; // Extract user ID
-    
             const newTask = {
                 name: taskName,
                 startDate: startDate ? startDate.toISOString().split('T')[0] : null,
@@ -229,25 +227,18 @@ const Taskcards = ({ onCloseModal }) => {
             localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
     
             // Now send the new task to the backend
-            try {
-                await axios.post(`https://taskly-backend-one.vercel.app/api/task-boxes/${userId}`, newTask, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+            const response = await axios.post(
+                `/api/task-boxes/${boxId}/tasks`, // API route to add a task to a box
+                { id: id, name: taskName, startDate: startDate, endDate: endDate }, // Task data
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            const updatedBox = response.data;
+
                 // Handle success if needed
-            } catch (apiError) {
-                console.error('Error saving task to backend:', apiError);
-                // Optionally, remove the task from local storage or state if the API request fails
-                const rollbackBoxes = [...updatedBoxes];
-                rollbackBoxes[currentBoxIndex].tasks = rollbackBoxes[currentBoxIndex].tasks.filter(task => task !== newTask);
-                setBoxes(rollbackBoxes);
-                localStorage.setItem('taskBoxes', JSON.stringify(rollbackBoxes));
+                setBoxes(prevBoxes => prevBoxes.map(box => (box._id === updatedBox._id ? updatedBox : box)));
+            } catch (error) {
+                console.error('Error adding task to box:', error.response?.data || error);
             }
-    
-            closeModal();
-        } catch (error) {
-            console.error('Error handling task:', error);
-            // Optionally, show error to the user
-        }
     };
     
 
