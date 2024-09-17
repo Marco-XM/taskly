@@ -202,7 +202,7 @@ const Taskcards = ({ onCloseModal }) => {
         return JSON.parse(decodedPayload);
     };
     
-    const handleAddTask = async (boxId ,taskName, startDate = null, endDate = null) => {
+    const handleAddTask = async (taskName, startDate = null, endDate = null, boxId) => {
         const token = localStorage.getItem('token');
         const decodedToken = decodeJwt(token);
         const userId = decodedToken._id;
@@ -658,7 +658,8 @@ const Taskcards = ({ onCloseModal }) => {
                         <TaskPopup
                         isOpen={modalOpen}
                         onClose={closeModal}
-                        onSubmit={handleAddTask}
+                        // onSubmit={handleAddTask}
+                        onSubmit={(taskName, startDate, endDate) => handleAddTask(taskName, startDate, endDate, box._id)}
                         />
                     )}
                 </div>
