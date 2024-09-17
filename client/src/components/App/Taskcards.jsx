@@ -222,10 +222,10 @@ const Taskcards = ({ onCloseModal }) => {
             // Update local state and local storage first
             const updatedBoxes = [...boxes];
             updatedBoxes[currentBoxIndex].tasks.push(newTask);
+            closeModal();
     
             setBoxes(updatedBoxes);
             localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
-            closeModal();
     
             // Now send the new task to the backend
             const response = await axios.post(
