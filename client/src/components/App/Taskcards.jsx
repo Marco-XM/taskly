@@ -341,14 +341,16 @@ const Taskcards = ({ onCloseModal }) => {
         const boxId = boxes[boxIndex]._id; // Get the ID of the box to be removed
         const updatedBoxes = [...boxes];
         updatedBoxes.splice(boxIndex, 1); // Optimistically remove the box from the UI
-    
+        const decodedToken = decodeJwt(token);
+        const userId = decodedToken._id;
+
         setBoxes(updatedBoxes); // Update local state
     
         const token = localStorage.getItem('token'); // Get the authentication token
     
         try {
             // Send request to delete the box from the database
-            await axios.delete(`/api/task-boxes/${boxId}`, {
+            await axios.delete(`/api/task-boxes/${userId}/${boxId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
         } catch (error) {
