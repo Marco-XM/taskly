@@ -532,12 +532,12 @@ const Taskcards = ({ onCloseModal }) => {
     };
     // done
 
-    const handleDragStart = (e, boxIndex, taskIndex) => {
+    const handleDragStart = (e, boxId, taskIndex) => {
         const taskItem = e.target.closest('.task-item');
 
         if (!taskItem) return;
 
-        e.dataTransfer.setData('boxIndex', boxIndex);
+        e.dataTransfer.setData('boxId', boxId);
         e.dataTransfer.setData('taskIndex', taskIndex);
         e.dataTransfer.effectAllowed = 'move';
 
@@ -596,22 +596,22 @@ const Taskcards = ({ onCloseModal }) => {
     //     // Update the state with the new boxes array
     //     setBoxes(updatedBoxes);
     // };
-    const handleDropOnBox = async (e, dropBoxIndex, dropTaskIndex) => {
+    const handleDropOnBox = async (e, dropBoxId, dropTaskIndex) => {
         e.preventDefault();
     
-        const dragBoxIndex = parseInt(e.dataTransfer.getData('boxIndex'), 10);
+        const dragBoxId = e.dataTransfer.getData('boxId');
         const dragTaskIndex = parseInt(e.dataTransfer.getData('taskIndex'), 10);
     
         const updatedBoxes = { ...boxes };
-        const draggedTask = updatedBoxes[dragBoxIndex].tasks[dragTaskIndex];
+        const draggedTask = updatedBoxes[dragBoxId].tasks[dragTaskIndex];
     
         // Remove the dragged task from its original position
-        updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
+        updatedBoxes[dragBoxId].tasks.splice(dragTaskIndex, 1);
     
         if (dropTaskIndex !== undefined && dropTaskIndex >= 0) {
-            updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex + 1, 0, draggedTask);
+            updatedBoxes[dropBoxId].tasks.splice(dropTaskIndex + 1, 0, draggedTask);
         } else {
-            updatedBoxes[dropBoxIndex].tasks.unshift(draggedTask);
+            updatedBoxes[dropBoxId].tasks.unshift(draggedTask);
         }
     
         setBoxes(updatedBoxes);
@@ -636,6 +636,8 @@ const Taskcards = ({ onCloseModal }) => {
             console.error('Error updating task positions in database:', error.response?.data || error);
         }
     };
+    
+    
     
     
     const handleDragOver = (e) => {
