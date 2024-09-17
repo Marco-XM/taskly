@@ -129,7 +129,7 @@ const Taskcards = ({ onCloseModal }) => {
         } catch (error) {
             console.error('Error Updating Box Color: ', error.response?.data || error);
         }
-        // setSelectedColor(color);
+        setSelectedColor(color);
     };
 
     const handlenavigate = () => {
