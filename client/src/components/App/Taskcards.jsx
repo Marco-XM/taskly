@@ -649,7 +649,7 @@ const Taskcards = ({ onCloseModal }) => {
         e.preventDefault();
     };
 
-    // const handleDropOnTask = (e, dropBoxIndex, dropTaskIndex) => {
+
     //     e.preventDefault();
     
     //     const dragBoxIndex = parseInt(e.dataTransfer.getData('boxIndex'), 10);
@@ -708,7 +708,7 @@ const Taskcards = ({ onCloseModal }) => {
             }
         } else {
             // Different boxes - moving task between boxes
-            handleDropOnBox();
+            handleDropOnBox(e, dropBoxIndex, dropTaskIndex);
         }
     
         setBoxes(updatedBoxes);
