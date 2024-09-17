@@ -531,7 +531,7 @@ const Taskcards = ({ onCloseModal }) => {
             console.error('Error moving task:', error.response?.data || error);
         }
     };
-    
+    // done
 
     const handleDragStart = (e, boxIndex, taskIndex) => {
         const taskItem = e.target.closest('.task-item');
@@ -573,7 +573,31 @@ const Taskcards = ({ onCloseModal }) => {
         }
     };
 
-    const handleDropOnBox = (e, dropBoxIndex, dropTaskIndex) => {
+    // const handleDropOnBox = (e, dropBoxIndex, dropTaskIndex) => {
+    //     e.preventDefault();
+    
+    //     const dragBoxIndex = parseInt(e.dataTransfer.getData('boxIndex'), 10);
+    //     const dragTaskIndex = parseInt(e.dataTransfer.getData('taskIndex'), 10);
+    
+    //     // Create a copy of the boxes state
+    //     const updatedBoxes = [...boxes];
+    
+    //     // Get the dragged task
+    //     const draggedTask = updatedBoxes[dragBoxIndex].tasks[dragTaskIndex];
+    
+    //     // Remove the dragged task from its original position
+    //     updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
+    
+    //     if (dropTaskIndex !== undefined && dropTaskIndex >= 0) {
+    //         updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex + 1, 0, draggedTask);
+    //     } else {
+    //         updatedBoxes[dropBoxIndex].tasks.unshift(draggedTask);
+    //     }
+    
+    //     // Update the state with the new boxes array
+    //     setBoxes(updatedBoxes);
+    // };
+    const handleDropOnBox = async (e, dropBoxIndex, dropTaskIndex) => {
         e.preventDefault();
     
         const dragBoxIndex = parseInt(e.dataTransfer.getData('boxIndex'), 10);
@@ -596,45 +620,125 @@ const Taskcards = ({ onCloseModal }) => {
     
         // Update the state with the new boxes array
         setBoxes(updatedBoxes);
+    
+        // Update the database with the new task positions
+        try {
+            const token = localStorage.getItem('token');
+            const decodedToken = decodeJwt(token);
+            const userId = decodedToken._id;
+    
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
+    
+            // Send the updated task boxes to the backend
+            await axios.put(
+                `/api/task-boxes/${userId}/update-tasks`,
+                { boxes: updatedBoxes },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        } catch (error) {
+            console.error('Error updating task positions in database:', error.response?.data || error);
+        }
     };
-
+    
     const handleDragOver = (e) => {
         e.preventDefault();
     };
 
-    const handleDropOnTask = (e, dropBoxIndex, dropTaskIndex) => {
+    // const handleDropOnTask = (e, dropBoxIndex, dropTaskIndex) => {
+    //     e.preventDefault();
+    
+    //     const dragBoxIndex = parseInt(e.dataTransfer.getData('boxIndex'), 10);
+    //     const dragTaskIndex = parseInt(e.dataTransfer.getData('taskIndex'), 10);
+
+    //     if (dragBoxIndex === dropBoxIndex && dropTaskIndex === dragTaskIndex) {
+    //         return; // Don't do anything if it's dropped on its related Draghere
+    //     }
+
+    //     if (dragBoxIndex === dropBoxIndex && dragTaskIndex - dropTaskIndex === 1) {
+    //         return;
+    //     }
+    
+    
+    //     if (dragBoxIndex === dropBoxIndex) {
+    //         const updatedBoxes = [...boxes];
+    //         const [draggedTask] = updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
+    
+    //         if (dropTaskIndex >= updatedBoxes[dropBoxIndex].tasks.length) {
+    //             updatedBoxes[dropBoxIndex].tasks.push(draggedTask);
+    //         } else if (dragTaskIndex < dropTaskIndex){
+    //             updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex, 0, draggedTask);
+    //         } else {
+    //             updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex +1, 0, draggedTask);
+    //         }
+    
+    //         setBoxes(updatedBoxes);
+    //     } else {
+    //         handleDropOnBox(e, dropBoxIndex, dropTaskIndex);
+    //     }
+    // };
+    const handleDropOnTask = async (e, dropBoxIndex, dropTaskIndex) => {
         e.preventDefault();
     
         const dragBoxIndex = parseInt(e.dataTransfer.getData('boxIndex'), 10);
         const dragTaskIndex = parseInt(e.dataTransfer.getData('taskIndex'), 10);
-
+    
+        // Prevent drop if it's dropped on the same task
         if (dragBoxIndex === dropBoxIndex && dropTaskIndex === dragTaskIndex) {
-            return; // Don't do anything if it's dropped on its related Draghere
+            return; // No operation if dropped on the same task
         }
-
+    
+        // Prevent drop if it’s moved to the same position
         if (dragBoxIndex === dropBoxIndex && dragTaskIndex - dropTaskIndex === 1) {
-            return;
+            return; // No operation if dropped in the same position
         }
     
-    
+        let updatedBoxes = [...boxes];
+        
         if (dragBoxIndex === dropBoxIndex) {
-            const updatedBoxes = [...boxes];
+            // Moving task within the same box
             const [draggedTask] = updatedBoxes[dragBoxIndex].tasks.splice(dragTaskIndex, 1);
     
             if (dropTaskIndex >= updatedBoxes[dropBoxIndex].tasks.length) {
                 updatedBoxes[dropBoxIndex].tasks.push(draggedTask);
-            } else if (dragTaskIndex < dropTaskIndex){
+            } else if (dragTaskIndex < dropTaskIndex) {
                 updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex, 0, draggedTask);
             } else {
-                updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex +1, 0, draggedTask);
+                updatedBoxes[dropBoxIndex].tasks.splice(dropTaskIndex + 1, 0, draggedTask);
+            }
+        } else {
+            // Moving task to a different box
+            handleDropOnBox(e, dropBoxIndex, dropTaskIndex);
+
+        }
+    
+        // Update local state
+        setBoxes(updatedBoxes);
+    
+        // Send updated task order to the backend
+        try {
+            const token = localStorage.getItem('token');
+            const decodedToken = decodeJwt(token);
+            const userId = decodedToken._id;
+    
+            if (!token) {
+                console.error('No token found');
+                return;
             }
     
-            setBoxes(updatedBoxes);
-        } else {
-            handleDropOnBox(e, dropBoxIndex, dropTaskIndex);
+            // Update the database with the new task order
+            await axios.put(
+                `/api/task-boxes/${userId}/update-tasks`,
+                { boxes: updatedBoxes },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        } catch (error) {
+            console.error('Error updating task positions in database:', error.response?.data || error);
         }
     };
-
+    
     const handleContextMenu = (e, boxIndex, taskIndex) => {
         e.preventDefault();
     
