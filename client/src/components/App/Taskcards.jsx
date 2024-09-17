@@ -347,6 +347,7 @@ const Taskcards = ({ onCloseModal }) => {
         const token = localStorage.getItem('token'); // Get the authentication token
         const decodedToken = decodeJwt(token);
         const userId = decodedToken._id;
+        console.log(userId)
     
         try {
             // Send request to delete the box from the database
