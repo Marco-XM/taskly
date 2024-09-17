@@ -239,6 +239,7 @@ const Taskcards = ({ onCloseModal }) => {
             } catch (error) {
                 console.error('Error adding task to box:', error.response?.data || error);
             }
+            closeModal();
     };
     
 
