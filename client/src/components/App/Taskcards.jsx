@@ -271,6 +271,28 @@ const Taskcards = ({ onCloseModal }) => {
         setCurrentTaskIndex(null);
     };
 
+    // const handleEditTask = (taskName, startDate = null, endDate = null) => {
+    //     const updatedBoxes = [...boxes];
+    //     const task = updatedBoxes[currentBoxIndex].tasks[currentTaskIndex];
+    
+    //     if (task) {
+    //         task.name = taskName;
+    //         task.startDate = startDate;
+    //         task.endDate = endDate;
+    //     }
+    
+    //     setBoxes(updatedBoxes);
+    //     localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes)); // Update local storage
+    //     closeEditModal();
+    // };
+
+    // const handleEditBox = (newBoxName) => {
+    //     const updatedBoxes = [...boxes];
+    //     updatedBoxes[currentBoxIndex].name = newBoxName;
+    //     setBoxes(updatedBoxes);
+    //     closeEditBoxModal();
+    // };
+
     const handleEditTask = async (taskName, startDate = null, endDate = null) => {
         const token = localStorage.getItem('token');
         const decodedToken = decodeJwt(token);
@@ -286,7 +308,6 @@ const Taskcards = ({ onCloseModal }) => {
         const boxId = updatedBoxes[currentBoxIndex]._id; // Ensure you have the box's `_id`
         const taskId = task._id; // Ensure you have the task's `_id`
         closeEditModal();
-
     
         if (task) {
             // Update the task locally
@@ -298,7 +319,7 @@ const Taskcards = ({ onCloseModal }) => {
         try {
             // Send update to the backend
             await axios.put(
-                `/api/task-boxes/${boxId}/tasks/${taskId}`, // Adjust this API path as needed
+                `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}`, // Adjust this API path as needed
                 { name: taskName, startDate, endDate }, // Data to update
                 { headers: { Authorization: `Bearer ${token}` } } // Send authorization token
             );
@@ -310,14 +331,7 @@ const Taskcards = ({ onCloseModal }) => {
         }
     };
     
-
-    // const handleEditBox = (newBoxName) => {
-    //     const updatedBoxes = [...boxes];
-    //     updatedBoxes[currentBoxIndex].name = newBoxName;
-    //     setBoxes(updatedBoxes);
-    //     closeEditBoxModal();
-    // };
-
+    
     const handleEditBox = async (newBoxName) => {
         const updatedBoxes = [...boxes];
         updatedBoxes[currentBoxIndex].name = newBoxName;
