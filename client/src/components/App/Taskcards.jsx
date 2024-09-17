@@ -63,9 +63,9 @@ const Taskcards = ({ onCloseModal }) => {
     }, []);  // Run only on component mount
 
     // Save task boxes to localStorage whenever they change
-    useEffect(() => {
-        localStorage.setItem('taskBoxes', JSON.stringify(boxes));
-    }, [boxes]);
+    // useEffect(() => {
+    //     localStorage.setItem('taskBoxes', JSON.stringify(boxes));
+    // }, [boxes]);
     // const addNewBox = (boxName) => {
     //     const updatedBoxes = [...boxes, { name: boxName, tasks: [], color: selectedColor}];
     //     setBoxes(updatedBoxes);
