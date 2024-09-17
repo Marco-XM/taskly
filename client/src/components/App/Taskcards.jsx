@@ -71,6 +71,7 @@ const Taskcards = ({ onCloseModal }) => {
     //     setBoxes(updatedBoxes);
     //     closeBoxModal();
     // };
+    
     const addNewBox = async (boxName) => {
         const token = localStorage.getItem('token');
         const decodedToken = decodeJwt(token); // Assuming decodeJwt correctly decodes the token
@@ -97,6 +98,7 @@ const Taskcards = ({ onCloseModal }) => {
             console.error('Error adding new box:', error.response?.data || error);
         }
     };
+    // done
     
 
     const generateId = () => {
@@ -104,8 +106,30 @@ const Taskcards = ({ onCloseModal }) => {
     };
 
 
-    const handleColorChange = (color) => {
-        setSelectedColor(color);
+    const handleColorChange = async (color) => {
+        const token = localStorage.getItem('token');
+        const decodedToken = decodeJwt(token); // Assuming decodeJwt correctly decodes the token
+        const userId = decodedToken._id;
+        const boxId = boxes[currentBoxIndex]._id
+
+        if (!token) {
+            console.error('No Token Found');
+            return;
+        }
+        try {
+            const updatedBoxes = [...boxes];
+            updatedBoxes[currentBoxIndex].color = color;
+            setBoxes[updatedBoxes];
+
+            await axios.put(
+                `api/task-boxes/${userId}/${boxId}/color`,
+                { color: color },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        } catch (error) {
+            console.error('Error Updating Box Color: ', error.response?.data || error);
+        }
+        // setSelectedColor(color);
     };
 
     const handlenavigate = () => {
@@ -243,6 +267,7 @@ const Taskcards = ({ onCloseModal }) => {
             console.error('Error adding task to box:', error.response?.data || error);
         }
     };
+    // done
 
     // const handleAddTask = (taskName) => {
     //     const updatedBoxes = [...boxes];
@@ -331,6 +356,7 @@ const Taskcards = ({ onCloseModal }) => {
             console.error('Error updating task in the database:', error.response?.data || error);
         }
     };
+    // done
     
     
     const handleEditBox = async (newBoxName) => {
@@ -369,6 +395,7 @@ const Taskcards = ({ onCloseModal }) => {
             console.error('Error updating box:', error.response?.data || error);
         }
     };
+    // done
 
     const removeTask = async (boxIndex, taskIndex) => {
         const token = localStorage.getItem('token');
@@ -400,6 +427,7 @@ const Taskcards = ({ onCloseModal }) => {
             // Optionally: Revert state changes in case of error
         }
     };
+    // done
     
 
     const removeBox = async (boxIndex) => {
@@ -426,6 +454,7 @@ const Taskcards = ({ onCloseModal }) => {
             // Optionally, show an error message to the user
         }
     };
+    // done
 
     const toggleMenu = (index) => {
         setOpenMenuIndex(openMenuIndex === index ? null : index);
