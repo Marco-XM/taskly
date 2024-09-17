@@ -34,7 +34,10 @@ const Taskcards = ({ onCloseModal }) => {
         { name: 'Processing', tasks: [], color: 'yellow'},
         { name: 'Completed', tasks: [], color: '#6ee7b7'},
     ];
-    const [boxes, setBoxes] = useState([])
+    const [boxes, setBoxes] = useState(() => {
+        const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
+        return savedBoxes || initialBoxes;
+    });
 
     // const [boxes, setBoxes] = useState([]);
 
@@ -44,28 +47,20 @@ const Taskcards = ({ onCloseModal }) => {
             const token = localStorage.getItem('token');
             const decodedToken = decodeJwt(token);
             const userId = decodedToken._id;
-
-            if (token) {
-                try {
-                    const response = await axios.get(`/api/task-boxes/${userId}`, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
-                    const fetchedBoxes = response.data;
-                    
-                    if (fetchedBoxes.length === 0) {
-                        // No boxes found, initialize with default boxes
-                        setBoxes(initialBoxes);
-                    } else {
-                        setBoxes(fetchedBoxes);
-                    }
-                } catch (error) {
-                    console.error('Error fetching boxes:', error.response?.data || error);
-                }
+    
+            try {
+                const response = await axios.get(`/api/task-boxes/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+    
+                setBoxes(response.data);
+            } catch (error) {
+                console.error('Error fetching task boxes:', error.response?.data || error);
             }
         };
-
+    
         fetchBoxes();
-    }, []); // Run only on component mount
+    }, []);  // Run only on component mount
 
     // Save task boxes to localStorage whenever they change
     // useEffect(() => {
