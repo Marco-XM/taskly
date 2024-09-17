@@ -43,27 +43,24 @@ const Taskcards = ({ onCloseModal }) => {
 
     // Save boxes and taskDates to local storage
     useEffect(() => {
-        const fetchTaskBoxes = async () => {
+        const fetchBoxes = async () => {
             const token = localStorage.getItem('token');
-            const decodedToken = decodeJwt(token); // Assuming decodeJwt correctly decodes the token
+            const decodedToken = decodeJwt(token);
             const userId = decodedToken._id;
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
-
+    
             try {
                 const response = await axios.get(`/api/task-boxes/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                setBoxes(response.data); // Set the state with the fetched data
+    
+                setBoxes(response.data);
             } catch (error) {
                 console.error('Error fetching task boxes:', error.response?.data || error);
             }
         };
-
-        fetchTaskBoxes();
-    }, []); // Run only on component mount
+    
+        fetchBoxes();
+    }, []);  // Run only on component mount
 
     // Save task boxes to localStorage whenever they change
     useEffect(() => {
@@ -206,41 +203,43 @@ const Taskcards = ({ onCloseModal }) => {
         const token = localStorage.getItem('token');
         const decodedToken = decodeJwt(token);
         const userId = decodedToken._id;
+    
         if (!token) {
             console.error('No token found');
             return; // Handle error appropriately, e.g., redirect to login
         }
-        const id = generateId();
+    
+        const id = generateId(); // Generate unique ID for the task
+    
         try {
             const newTask = {
+                id,
                 name: taskName,
-                startDate: startDate ? startDate.toISOString().split('T')[0] : null,
-                endDate: endDate ? endDate.toISOString().split('T')[0] : null,
-                userId: userId, // Add user ID to the task data
+                startDate: startDate ? startDate.toISOString() : null,
+                endDate: endDate ? endDate.toISOString() : null,
+                userId, // Add user ID to the task data
             };
     
-            // Update local state and local storage first
-            const updatedBoxes = [...boxes];
-            updatedBoxes[currentBoxIndex].tasks.push(newTask);
-            closeModal();
-    
-            setBoxes(updatedBoxes);
-            localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
-    
-            // Now send the new task to the backend
+            // Send the new task to the backend
             const response = await axios.post(
                 `/api/task-boxes/${boxId}/tasks`, // API route to add a task to a box
-                { id: id, name: taskName, startDate: startDate, endDate: endDate }, // Task data
+                newTask, // Task data
                 { headers: { Authorization: `Bearer ${token}` } }
             );
+            
             const updatedBox = response.data;
-
-                // Handle success if needed
-                setBoxes(prevBoxes => prevBoxes.map(box => (box._id === updatedBox._id ? updatedBox : box)));
-            } catch (error) {
-                console.error('Error adding task to box:', error.response?.data || error);
-            }
+    
+            // Update local state based on the response from the backend
+            setBoxes(prevBoxes => prevBoxes.map(box => 
+                box._id === updatedBox._id ? updatedBox : box
+            ));
+    
+            closeModal(); // Close the modal after adding the task
+        } catch (error) {
+            console.error('Error adding task to box:', error.response?.data || error);
+        }
     };
+    
     
 
     
