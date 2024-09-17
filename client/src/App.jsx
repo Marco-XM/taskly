@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
 import CalendarPage from './pages/CalendarPage';
+import useSyncLocalStorage from './useSyncLocalStorage';
 
 // Axios default configuration
 axios.defaults.baseURL = 'https://taskly-backend-one.vercel.app';
@@ -37,6 +38,8 @@ const PrivateRoute = ({ children }) => {
 
 
 const App = () => {
+  useSyncLocalStorage();
+
   return (
     <>
       <Toaster position='bottom-right' toastOptions={{ duration: 2000 }} />
