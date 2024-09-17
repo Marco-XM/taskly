@@ -618,10 +618,8 @@ const Taskcards = ({ onCloseModal }) => {
             updatedBoxes[dropBoxIndex].tasks.unshift(draggedTask);
         }
     
-        // Update the state with the new boxes array
         setBoxes(updatedBoxes);
     
-        // Update the database with the new task positions
         try {
             const token = localStorage.getItem('token');
             const decodedToken = decodeJwt(token);
@@ -631,11 +629,14 @@ const Taskcards = ({ onCloseModal }) => {
                 console.error('No token found');
                 return;
             }
+    
+            // Get the IDs for the task and boxes
             const dropBoxId = updatedBoxes[dropBoxIndex]._id;
             const taskId = draggedTask._id;
-            // Send the updated task boxes to the backend
+    
+            // Update task in the database
             await axios.put(
-                `/api/task-boxes/${userId}/${dropBoxId}/tasks/${taskId}/add`,
+                `/api/task-boxes/${userId}/${dropBoxId}/tasks/${taskId}/update-order`,
                 { boxes: updatedBoxes },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
