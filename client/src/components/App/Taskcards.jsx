@@ -23,7 +23,6 @@ const Taskcards = ({ onCloseModal }) => {
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
     const [boxModalOpen, setBoxModalOpen] = useState(null);
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
-    const [selectedColor, setSelectedColor] = useState("#aabbcc");
     const [dragImage, setDragImage] = useState(null);
     const editFormRef = useRef(null);
     const navigate = useNavigate();
