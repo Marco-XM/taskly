@@ -85,7 +85,7 @@ const CalendarPage = () => {
     useEffect(() => {
         const taskEvents = boxes.flatMap(box =>
             box.tasks.map(task => ({
-                id: task.id,
+                id: task._id,
                 title: task.name,
                 start: task.startDate,
                 end: task.endDate ? task.endDate : task.startDate,
