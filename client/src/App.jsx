@@ -7,7 +7,6 @@ import Login from './pages/Login';
 import CalendarPage from './pages/CalendarPage';
 import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
-import jwtDecode from 'jwt-decode';  // For decoding the token
 
 // Axios default configuration
 axios.defaults.baseURL = 'https://taskly-backend-one.vercel.app';
@@ -23,11 +22,37 @@ const PublicRoute = ({ children }) => {
   return !localStorage.getItem('token') ? children : <Navigate to="/dashboard" />;
 };
 
+const base64UrlDecode = (str) => {
+  // Convert Base64Url to Base64
+  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  // Pad Base64 string if necessary
+  while (base64.length % 4 !== 0) {
+      base64 += '=';
+  }
+  // Decode Base64 string to a string
+  return atob(base64);
+};
+
+const decodeJwt = (token) => {
+  if (!token) {
+      throw new Error('No token provided');
+  }
+
+  const parts = token.split('.');
+  if (parts.length !== 3) {
+      throw new Error('JWT does not have 3 parts');
+  }
+
+  const payload = parts[1];
+  const decodedPayload = base64UrlDecode(payload);
+  return JSON.parse(decodedPayload);
+};
+
 // Helper function to get userId from the token
 const getUserIdFromToken = () => {
   const token = localStorage.getItem('token');
   if (token) {
-    const decoded = jwtDecode(token);
+    const decoded = decodeJwt(token);
     return decoded._id;  // Assuming your JWT contains the userId as _id
   }
   return null;
