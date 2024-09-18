@@ -214,7 +214,7 @@ const CalendarPage = () => {
         setEvents(updatedEvents);
     
         // Find the box and task IDs
-        const box = boxes.find(box => box.tasks.some(task => task._id === id));
+        const box = boxes.find(box => box.tasks.some(task => task.id === id));
         if (!box) {
             console.error('Box containing the task not found');
             return;
@@ -230,7 +230,7 @@ const CalendarPage = () => {
             const userId = decodedToken._id;
     
             await axios.put(
-                `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}`,
+                `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}/update-date`,
                 { startDate: formattedStart, endDate: formattedEnd },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
