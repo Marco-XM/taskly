@@ -34,19 +34,48 @@ const PrivateRoute = ({ children }) => {
 //   }
 // };
 
+const base64UrlDecode = (str) => {
+  // Convert Base64Url to Base64
+  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  // Pad Base64 string if necessary
+  while (base64.length % 4 !== 0) {
+      base64 += '=';
+  }
+  // Decode Base64 string to a string
+  return atob(base64);
+};
 
+const decodeJwt = (token) => {
+  if (!token) {
+      throw new Error('No token provided');
+  }
+
+  const parts = token.split('.');
+  if (parts.length !== 3) {
+      throw new Error('JWT does not have 3 parts');
+  }
+
+  const payload = parts[1];
+  const decodedPayload = base64UrlDecode(payload);
+  return JSON.parse(decodedPayload);
+};
 
 const App = () => {
+  const token = localStorage.getItem('token');
+  const decodedToken = decodeJwt(token);
+  const userId = decodedToken._id;
   return (
     <>
       <Toaster position='bottom-right' toastOptions={{ duration: 2000 }} />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/app" element={<PrivateRoute><WorkSpace /></PrivateRoute>} />
-        <Route path="/dashboard" element={<DashBoard />} />
+        {userId && (
+          <Route path={`/app/${userId}`} element={<PrivateRoute><WorkSpace userId={userId} /></PrivateRoute>} />
+        )}
+        <Route path="/dashboard" element={<PrivateRoute><DashBoard /></PrivateRoute>} />
         <Route path="/register" element={<Registration />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/calendar" element={<CalendarPage/>}/>
+        <Route path="/calendar" element={<PrivateRoute><CalendarPage/></PrivateRoute>}/>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </>
