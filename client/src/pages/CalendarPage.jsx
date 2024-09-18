@@ -57,16 +57,19 @@ const CalendarPage = () => {
                 const fetchedBoxes = response.data;
     
                 const fullCalendarEvents = fetchedBoxes.flatMap(box =>
-                    box.tasks.map(task => ({
-                        id: task._id, // Using MongoDB task _id for FullCalendar's event id
-                        title: task.name,
-                        start: task.startDate,
-                        end: task.endDate,
-                    }))
+                    box.tasks.map(task => {
+                        console.log('Task ID:', task._id); // Log the task ID here
+                        return {
+                            id: task._id, // Using MongoDB task _id for FullCalendar's event id
+                            title: task.name,
+                            start: task.startDate,
+                            end: task.endDate,
+                        };
+                    })
                 );
     
-                setBoxes(fetchedBoxes); // Set boxes to manage local state
-                setEvents(fullCalendarEvents); // Pass this to FullCalendar
+                setBoxes(fetchedBoxes);
+                setEvents(fullCalendarEvents);
             } catch (error) {
                 console.error('Error fetching tasks from database:', error);
             }
@@ -74,6 +77,7 @@ const CalendarPage = () => {
     
         fetchTaskBoxes();
     }, []);
+    
     
 
     useEffect(() => {
@@ -176,58 +180,34 @@ const CalendarPage = () => {
     //     setEvents(updatedEvents);
     // };
 
-const handleEventChange = async (changeInfo) => {
-    const { event } = changeInfo;
-    const { id, start, end } = event; // This 'id' comes from FullCalendar, ensure it matches the task's _id
-
-    // Format the dates if necessary
-    const formattedStart = formatDate(start);
-    const formattedEnd = end ? formatDate(end) : formattedStart;
-
-    // Update the task in `boxes`
-    const updatedBoxes = boxes.map(box => ({
-        ...box,
-        tasks: box.tasks.map(task => {
-            if (task._id === id) { // Use task._id instead of task.id
-                return {
-                    ...task,
-                    startDate: formattedStart,
-                    endDate: formattedEnd,
-                };
-            }
-            return task;
-        })
-    }));
-
-    // Find the box containing the task
-    const box = boxes.find(box => box.tasks.some(task => task._id === id)); // Use task._id here as well
-
-    if (!box) {
-        console.error(`Box containing task with _id ${id} not found`);
-        return;
-    }
-
-    const boxId = box._id; // Use the box's MongoDB _id
-    const taskId = id; // Use the FullCalendar event id, which should correspond to task._id
-
-    // Send the updated task details to the backend
-    try {
-        const token = localStorage.getItem('token');
-        const decodedToken = decodeJwt(token);
-        const userId = decodedToken._id;
-
-        await axios.put(
-            `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}/update-date`,
-            { startDate: formattedStart, endDate: formattedEnd },
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
-    } catch (error) {
-        console.error('Error updating task in database:', error.response?.data || error);
-    }
-
-    // Update the boxes state to reflect the changes
-    setBoxes(updatedBoxes);
-};
+    const handleEventChange = async (changeInfo) => {
+        const updatedEvent = changeInfo.event;
+    
+        // Log the event ID (which should be the MongoDB _id)
+        console.log('Updated Task ID:', updatedEvent.id);
+    
+        try {
+            const token = localStorage.getItem('token');
+            const decodedToken = decodeJwt(token);
+            const userId = decodedToken._id;
+    
+            const { id, start, end } = updatedEvent; // This is the MongoDB _id
+    
+            const response = await axios.put(
+                `/api/task-boxes/${userId}/${boxId}/tasks/${id}`,
+                {
+                    startDate: start.toISOString(),
+                    endDate: end.toISOString(),
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            console.log('Task successfully updated:', response.data);
+        } catch (error) {
+            console.error('Error updating task:', error);
+        }
+    };
+    
 
     
     
