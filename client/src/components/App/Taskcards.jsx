@@ -251,8 +251,8 @@ const Taskcards = ({ onCloseModal }) => {
             const newTask = {
                 id,
                 name: taskName,
-                startDate: startDate,
-                endDate: endDate,
+                startDate: startDate ? startDate.toISOString().split('T')[0] : null,
+                endDate: endDate ? endDate.toISOString().split('T')[0] : null,
                 userId, // Add user ID to the task data
             };
             const updatedBoxes = [...boxes];
