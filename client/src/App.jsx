@@ -45,10 +45,10 @@ const decodeJwt = (token) => {
   const decodedPayload = base64UrlDecode(payload);
   return JSON.parse(decodedPayload);
 };
+const token = localStorage.getItem('token');
+const decodedToken = decodeJwt(token);
+const userId = decodedToken._id;
 const App = () => {
-  const token = localStorage.getItem('token');
-  const decodedToken = decodeJwt(token);
-  const userId = decodedToken._id;
 
 
 
