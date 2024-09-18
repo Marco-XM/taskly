@@ -57,15 +57,17 @@ const CalendarPage = () => {
                 const fetchedBoxes = response.data;
     
                 const fullCalendarEvents = fetchedBoxes.flatMap(box =>
-                    box.tasks.map(task => {
-                        console.log('Task ID:', task._id); // Log the task ID here
-                        return {
-                            id: task._id, // Using MongoDB task _id for FullCalendar's event id
-                            title: task.name,
-                            start: task.startDate,
-                            end: task.endDate,
-                        };
-                    })
+                    box.tasks.map(task => ({
+                        id: task._id,
+                        title: task.name,
+                        start: task.startDate,
+                        end: task.endDate,
+                        color: box.color,
+                        extendedProps: {
+                            color: box.color,
+                        },
+                        allDay: false,
+                    }))
                 );
     
                 setBoxes(fetchedBoxes);
