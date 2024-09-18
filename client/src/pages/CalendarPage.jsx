@@ -189,10 +189,6 @@ const CalendarPage = () => {
         // Format the start and end dates
         const formattedStart = formatDate(start);
         const formattedEnd = end ? formatDate(end) : formattedStart;
-    
-        // Log the event information
-        console.log("FullCalendar event ID:", id);
-        console.log("FullCalendar event object:", event);
 
         // Find the box containing the task
         const box = boxes.find(box => box.tasks.some(task => task._id === id));
@@ -206,8 +202,6 @@ const CalendarPage = () => {
         const taskId = id; // This is the FullCalendar task ID
     
         // Log the box and task IDs
-        console.log("TaskBox ID:", boxId);
-        console.log("Task ID:", taskId);
     
         // Update state (tasks in boxes)
         const updatedBoxes = boxes.map(box => ({
@@ -255,12 +249,6 @@ const CalendarPage = () => {
             console.error('Error updating task in the database:', error.response?.data || error);
         }
     };
-    
-
-    
-    
-    
-    
 
     return (
         <div className='calendar-page flex w-full h-screen'>
