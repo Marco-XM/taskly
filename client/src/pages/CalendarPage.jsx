@@ -175,47 +175,39 @@ const CalendarPage = () => {
 
     const handleEventChange = async (changeInfo) => {
         const { event } = changeInfo;
-        const { id, start, end } = event;
+        const { id, start, end } = event; // This 'id' comes from FullCalendar, ensure it matches the task's _id
     
-        // Format the start and end dates
-        const formattedStart = formatDate(start);
-        const formattedEnd = end ? formatDate(end) : formattedStart;
+        // Format the dates if necessary
+        const formattedStart = start.toISOString(); // Ensure the date is in the correct format
+        const formattedEnd = end ? end.toISOString() : null;
     
-        // Find the box containing the task and update only that box
-        const updatedBoxes = boxes.map(box => {
-            const taskIndex = box.tasks.findIndex(task => task._id === id);
-            if (taskIndex !== -1) {
-                // Update the task's dates
-                box.tasks[taskIndex].startDate = formattedStart;
-                box.tasks[taskIndex].endDate = formattedEnd;
-                return { ...box }; // Return updated box
-            }
-            return box; // Return unchanged box if task not found
-        });
+        // Update the task in `boxes`
+        const updatedBoxes = boxes.map(box => ({
+            ...box,
+            tasks: box.tasks.map(task => {
+                if (task._id === id) { // Use task._id instead of task.id
+                    return {
+                        ...task,
+                        startDate: formattedStart,
+                        endDate: formattedEnd,
+                    };
+                }
+                return task;
+            })
+        }));
     
-        // Update state
-        setBoxes(updatedBoxes);
+        // Find the box containing the task
+        const box = boxes.find(box => box.tasks.some(task => task._id === id)); // Use task._id here as well
     
-        // Update FullCalendar events
-        const updatedEvents = events.map(ev => {
-            if (ev.id === id) {
-                return {
-                    ...ev,
-                    start, // Use the Date object for FullCalendar
-                    end: end || start, // Use the Date object for FullCalendar
-                };
-            }
-            return ev;
-        });
+        if (!box) {
+            console.error(`Box containing task with _id ${id} not found`);
+            return;
+        }
     
-        setEvents(updatedEvents);
+        const boxId = box._id; // Use the box's MongoDB _id
+        const taskId = id; // Use the FullCalendar event id, which should correspond to task._id
     
-        // Find the box and task IDs
-        const box = boxes.find(box => box.tasks.some(task => task._id === id));
-        const boxId = box._id;
-        const taskId = id;
-    
-        // Send updated task to the backend
+        // Send the updated task details to the backend
         try {
             const token = localStorage.getItem('token');
             const decodedToken = decodeJwt(token);
@@ -229,7 +221,11 @@ const CalendarPage = () => {
         } catch (error) {
             console.error('Error updating task in database:', error.response?.data || error);
         }
+    
+        // Update the boxes state to reflect the changes
+        setBoxes(updatedBoxes);
     };
+    
     
     
     
