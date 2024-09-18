@@ -351,15 +351,12 @@ const Taskcards = ({ onCloseModal }) => {
         const boxId = updatedBoxes[currentBoxIndex]._id; // Ensure you have the box's `_id`
         const taskId = task._id; // Ensure you have the task's `_id`
         closeEditModal();
-
-        const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : null;
-        const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : null;
-
+    
         if (task) {
             // Update the task locally
             task.name = taskName;
-            task.startDate = formattedStartDate;
-            task.endDate = formattedEndDate;
+            task.startDate = startDate;
+            task.endDate = endDate;
         }
     
         try {
