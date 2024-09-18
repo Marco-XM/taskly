@@ -215,10 +215,6 @@ const CalendarPage = () => {
     
         // Find the box and task IDs
         const box = boxes.find(box => box.tasks.some(task => task.id === id));
-        if (!box) {
-            console.error('Box containing the task not found');
-            return;
-        }
     
         const boxId = box._id;
         const taskId = id;
