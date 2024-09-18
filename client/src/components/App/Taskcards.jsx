@@ -247,14 +247,19 @@ const Taskcards = ({ onCloseModal }) => {
     
         const id = generateId(); // Generate unique ID for the task
     
+        // Format the dates to 'YYYY-MM-DD' without using toISOString()
+        const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : null;
+        const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : null;
+    
         try {
             const newTask = {
                 id,
                 name: taskName,
-                startDate: startDate ? startDate.toISOString().split('T')[0] : null,
-                endDate: endDate ? endDate.toISOString().split('T')[0] : null,
-                userId, // Add user ID to the task data
+                startDate: formattedStartDate, // Pass the formatted date
+                endDate: formattedEndDate,     // Pass the formatted date
+                userId, 
             };
+    
             const updatedBoxes = [...boxes];
             updatedBoxes[currentBoxIndex].tasks.push(newTask);
             setBoxes(updatedBoxes);
@@ -278,6 +283,7 @@ const Taskcards = ({ onCloseModal }) => {
             console.error('Error adding task to box:', error.response?.data || error);
         }
     };
+    
     // done
 
     // const handleAddTask = (taskName) => {
