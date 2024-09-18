@@ -216,7 +216,7 @@ const handleEventChange = async (changeInfo) => {
 
     const boxId = box._id; // Use the box's MongoDB _id
     const taskId = id; // Use the FullCalendar event id, which should correspond to task._id
-
+    console.log(taskId)
     // Send the updated task details to the backend
     try {
         const token = localStorage.getItem('token');
