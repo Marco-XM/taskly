@@ -181,20 +181,17 @@ const CalendarPage = () => {
         const formattedStart = formatDate(start);
         const formattedEnd = end ? formatDate(end) : formattedStart;
     
-        // Update the task in `boxes`
-        const updatedBoxes = boxes.map(box => ({
-            ...box,
-            tasks: box.tasks.map(task => {
-                if (task.id === id) {
-                    return {
-                        ...task,
-                        startDate: formattedStart,
-                        endDate: formattedEnd,
-                    };
-                }
-                return task;
-            })
-        }));
+        // Find the box containing the task and update only that box
+        const updatedBoxes = boxes.map(box => {
+            const taskIndex = box.tasks.findIndex(task => task.id === id);
+            if (taskIndex !== -1) {
+                // Update the task's dates
+                box.tasks[taskIndex].startDate = formattedStart;
+                box.tasks[taskIndex].endDate = formattedEnd;
+                return { ...box }; // Return updated box
+            }
+            return box; // Return unchanged box if task not found
+        });
     
         // Update state
         setBoxes(updatedBoxes);
@@ -215,7 +212,6 @@ const CalendarPage = () => {
     
         // Find the box and task IDs
         const box = boxes.find(box => box.tasks.some(task => task.id === id));
-    
         const boxId = box._id;
         const taskId = id;
     
@@ -234,6 +230,7 @@ const CalendarPage = () => {
             console.error('Error updating task in database:', error.response?.data || error);
         }
     };
+    
     
     
     
