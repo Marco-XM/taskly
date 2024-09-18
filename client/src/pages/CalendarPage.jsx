@@ -181,8 +181,8 @@ const CalendarPage = () => {
     // };
 
     const handleEventChange = async (changeInfo) => {
-        const { event } = changeInfo;
-        const { id, start, end } = event;
+        const { events } = changeInfo;
+        const { id, start, end } = events;
     
         // Format the start and end dates
         const formattedStart = formatDate(start);
@@ -190,7 +190,7 @@ const CalendarPage = () => {
     
         // Log the event information
         console.log("FullCalendar event ID:", id);
-        console.log("FullCalendar event object:", event);
+        console.log("FullCalendar event object:", events);
 
         // Find the box containing the task
         const box = boxes.find(box => box.tasks.some(task => task._id === id));
