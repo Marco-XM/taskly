@@ -31,9 +31,7 @@ const Registration = () => {
             });
             const data = await response.json();
             if (response.ok) {
-                localStorage.setItem('token', data.token);  // Store token
-                const userId = data.user._id;  // Assuming the response contains a 'user' object with the '_id'
-                navigat(`/app/${userId}`);  // Redirect to /app/:userId
+                navigat('/app');
             } else {
                 setMessage(data.error);
             }
@@ -42,7 +40,6 @@ const Registration = () => {
             setMessage('An error occurred');
         }
     };
-    
     const className="text-white m-4 p-5 bg-red-50 bg-opacity-0 border-b"
     return (
         <div className='grid grid-rows-2'>
