@@ -14,7 +14,7 @@ import axios from 'axios';
 
 
 
-const Taskcards = ({ onCloseModal, task }) => {
+const Taskcards = ({ onCloseModal }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [editBoxModalOpen, setEditBoxModalOpen] = useState(false);
@@ -762,8 +762,7 @@ const Taskcards = ({ onCloseModal, task }) => {
             document.removeEventListener('click', handleClickOutside);
         };
     },);
-    const formattedStartDate = task.startDate ? task.startDate.toISOString().split('T')[0] : null;
-    const formattedEndDate = task.endDate ? task.endDate.toISOString().split('T')[0] : null;
+
     const renderTaskCards = () => (
         <>
                 {/* <SpeedInsights /> */}
@@ -865,12 +864,12 @@ const Taskcards = ({ onCloseModal, task }) => {
                                                 {task.name}
                                             </li>
                                             <p className='text-xs self-end text-white bg-gray-400 bg-opacity-20 p-1 rounded-xl'>
-                                                {formattedStartDate && formattedEndDate 
-                                                    ? `${formattedStartDate} : ${formattedEndDate}` 
-                                                    : (formattedStartDate 
-                                                        ? `Start: ${formattedStartDate}` 
-                                                        : (formattedEndDate 
-                                                            ? `End: ${formattedEndDate}` 
+                                                {task.startDate && task.endDate 
+                                                    ? `${task.startDate} : ${task.endDate}` 
+                                                    : (task.startDate 
+                                                        ? `Start: ${task.startDate}` 
+                                                        : (task.endDate 
+                                                            ? `End: ${task.endDate}` 
                                                             : ' ')
                                                     )
                                                 }
