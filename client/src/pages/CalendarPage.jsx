@@ -131,6 +131,48 @@ const CalendarPage = () => {
     
 
     // Handle event date and time changes (dragging, resizing, or editing)
+    // const handleEventChange = (changeInfo) => {
+    //     const { event } = changeInfo;
+    //     const { id, start, end } = event;
+    
+    //     // Format the start and end dates
+    //     const formattedStart = formatDate(start);
+    //     const formattedEnd = end ? formatDate(end) : formattedStart;
+    
+    //     // Update the task in `boxes`
+    //     const updatedBoxes = boxes.map(box => ({
+    //         ...box,
+    //         tasks: box.tasks.map(task => {
+    //             if (task.id === id) {
+    //                 return {
+    //                     ...task,
+    //                     startDate: formattedStart,
+    //                     endDate: formattedEnd,
+    //                 };
+    //             }
+    //             return task;
+    //         })
+    //     }));
+    
+    //     // Update state and localStorage
+    //     setBoxes(updatedBoxes);
+    //     localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
+    
+    //     // Update FullCalendar events
+    //     const updatedEvents = events.map(ev => {
+    //         if (ev.id === id) {
+    //             return {
+    //                 ...ev,
+    //                 start, // Use the Date object for FullCalendar
+    //                 end: end || start, // Use the Date object for FullCalendar
+    //             };
+    //         }
+    //         return ev;
+    //     });
+    
+    //     setEvents(updatedEvents);
+    // };
+
     const handleEventChange = async (changeInfo) => {
         const { event } = changeInfo;
         const { id, start, end } = event;
@@ -171,14 +213,21 @@ const CalendarPage = () => {
     
         setEvents(updatedEvents);
     
+        // Find the box and task IDs
+        const box = boxes.find(box => box.tasks.some(task => task.id === id));
+        if (!box) {
+            console.error('Box containing the task not found');
+            return;
+        }
+    
+        const boxId = box._id;
+        const taskId = id;
+    
         // Send updated task to the backend
         try {
             const token = localStorage.getItem('token');
             const decodedToken = decodeJwt(token);
             const userId = decodedToken._id;
-    
-            const boxId = boxes.find(box => box.tasks.some(task => task.id === id))._id;
-            const taskId = id;
     
             await axios.put(
                 `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}`,
@@ -189,7 +238,6 @@ const CalendarPage = () => {
             console.error('Error updating task in database:', error.response?.data || error);
         }
     };
-    
     
     
     
