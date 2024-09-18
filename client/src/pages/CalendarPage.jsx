@@ -183,7 +183,7 @@ const CalendarPage = () => {
     
         // Find the box containing the task and update only that box
         const updatedBoxes = boxes.map(box => {
-            const taskIndex = box.tasks.findIndex(task => task.id === id);
+            const taskIndex = box.tasks.findIndex(task => task._id === id);
             if (taskIndex !== -1) {
                 // Update the task's dates
                 box.tasks[taskIndex].startDate = formattedStart;
@@ -211,7 +211,7 @@ const CalendarPage = () => {
         setEvents(updatedEvents);
     
         // Find the box and task IDs
-        const box = boxes.find(box => box.tasks.some(task => task.id === id));
+        const box = boxes.find(box => box.tasks.some(task => task._id === id));
         const boxId = box._id;
         const taskId = id;
     
