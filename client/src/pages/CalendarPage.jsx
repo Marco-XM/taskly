@@ -4,6 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid'; // For time adjustment
 import interactionPlugin from '@fullcalendar/interaction';
 import ViewOptions from '../components/Calendar/ViewOptions';
+import axios from 'axios';
 
 const CalendarPage = () => {
     const [boxes, setBoxes] = useState([]); // State to hold task boxes
@@ -12,14 +13,26 @@ const CalendarPage = () => {
     const [view, setView] = useState('dayGridMonth'); // Initial view
     const calendarRef = useRef(null);
 
+    const token = localStorage.getItem('token');
+    const decodedToken = decodeJwt(token);
+    const userId = decodedToken._id;
+
     // Fetch tasks from localStorage and convert them into FullCalendar events
     useEffect(() => {
-        const savedBoxes = localStorage.getItem('taskBoxes');
-        if (savedBoxes) {
-            const parsedBoxes = JSON.parse(savedBoxes);
-            setBoxes(parsedBoxes);
-        }
-    }, []);
+        const fetchTaskBoxes = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get(`/api/task-boxes/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setBoxes(response.data);
+            } catch (error) {
+                console.error('Error fetching task boxes:', error.response?.data || error);
+            }
+        };
+
+        fetchTaskBoxes();
+    }, [userId]);
 
     // Sync events with the current state of `boxes`
     useEffect(() => {
@@ -38,6 +51,28 @@ const CalendarPage = () => {
         );
         setEvents(taskEvents);
     }, [boxes]);
+
+    const base64UrlDecode = (str) => {
+        // Convert Base64Url to Base64
+        let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+        // Pad Base64 string if necessary
+        while (base64.length % 4 !== 0) {
+            base64 += '=';
+        }
+        // Decode Base64 string to a string
+        return atob(base64);
+    };
+    
+    const decodeJwt = (token) => {
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+            throw new Error('JWT does not have 3 parts');
+        }
+    
+        const payload = parts[1];
+        const decodedPayload = base64UrlDecode(payload);
+        return JSON.parse(decodedPayload);
+    };
     
     
 
