@@ -16,13 +16,51 @@ const CalendarPage = () => {
 
 
     // Fetch tasks from localStorage and convert them into FullCalendar events
+
+    const base64UrlDecode = (str) => {
+        // Convert Base64Url to Base64
+        let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+        // Pad Base64 string if necessary
+        while (base64.length % 4 !== 0) {
+            base64 += '=';
+        }
+        // Decode Base64 string to a string
+        return atob(base64);
+    };
+
+    const decodeJwt = (token) => {
+        if (!token) {
+            throw new Error('No token provided');
+        }
+
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+            throw new Error('JWT does not have 3 parts');
+        }
+
+        const payload = parts[1];
+        const decodedPayload = base64UrlDecode(payload);
+        return JSON.parse(decodedPayload);
+    };
+
     useEffect(() => {
         const fetchTaskBoxes = async () => {
             const token = localStorage.getItem('token');
-            const decodedToken = decodeJwt(token);
-            const userId = decodedToken._id;
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
+
+            let userId;
             try {
-                const token = localStorage.getItem('token');
+                const decodedToken = decodeJwt(token);
+                userId = decodedToken._id;
+            } catch (error) {
+                console.error('Error decoding token:', error);
+                return;
+            }
+
+            try {
                 const response = await axios.get(`/api/task-boxes/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -35,7 +73,6 @@ const CalendarPage = () => {
         fetchTaskBoxes();
     }, []);
 
-    // Sync events with the current state of `boxes`
     useEffect(() => {
         const taskEvents = boxes.flatMap(box =>
             box.tasks.map(task => ({
@@ -52,28 +89,6 @@ const CalendarPage = () => {
         );
         setEvents(taskEvents);
     }, [boxes]);
-
-    const base64UrlDecode = (str) => {
-        // Convert Base64Url to Base64
-        let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
-        // Pad Base64 string if necessary
-        while (base64.length % 4 !== 0) {
-            base64 += '=';
-        }
-        // Decode Base64 string to a string
-        return atob(base64);
-    };
-    
-    const decodeJwt = (token) => {
-        const parts = token.split('.');
-        if (parts.length !== 3) {
-            throw new Error('JWT does not have 3 parts');
-        }
-    
-        const payload = parts[1];
-        const decodedPayload = base64UrlDecode(payload);
-        return JSON.parse(decodedPayload);
-    };
     
     
 
