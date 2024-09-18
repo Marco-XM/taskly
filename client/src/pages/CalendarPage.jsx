@@ -190,6 +190,7 @@ const handleEventChange = async (changeInfo) => {
     // Format the dates if necessary
     const formattedStart = formatDate(start);
     const formattedEnd = end ? formatDate(end) : formattedStart;
+    console.log('Updated Task1 ID:', updatedEvent.id);
 
     // Update the task in `boxes`
     const updatedBoxes = boxes.map(box => ({
@@ -205,6 +206,7 @@ const handleEventChange = async (changeInfo) => {
             return task;
         })
     }));
+    console.log('Updated Task2 ID:', updatedEvent.id);
 
     // Find the box containing the task
     const box = boxes.find(box => box.tasks.some(task => task._id === id)); // Use task._id here as well
@@ -213,6 +215,7 @@ const handleEventChange = async (changeInfo) => {
         console.error(`Box containing task with _id ${id} not found`);
         return;
     }
+    console.log('Updated Task3 ID:', updatedEvent.id);
 
     const boxId = box._id; // Use the box's MongoDB _id
     const taskId = id; // Use the FullCalendar event id, which should correspond to task._id
