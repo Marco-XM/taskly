@@ -762,8 +762,8 @@ const Taskcards = ({ onCloseModal, task }) => {
             document.removeEventListener('click', handleClickOutside);
         };
     },);
-    const formattedStartDate = task.startDate ? format(new Date(task.startDate), 'MMMM dd, yyyy') : null;
-    const formattedEndDate = task.endDate ? format(new Date(task.endDate), 'MMMM dd, yyyy') : null;
+    const formattedStartDate = task.startDate ? task.startDate.toISOString().split('T')[0] : null;
+    const formattedEndDate = task.endDate ? task.endDate.toISOString().split('T')[0] : null;
     const renderTaskCards = () => (
         <>
                 {/* <SpeedInsights /> */}
