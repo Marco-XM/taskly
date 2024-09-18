@@ -36,18 +36,13 @@ const PrivateRoute = ({ children }) => {
 
 
 
-const token = localStorage.getItem('token');
-const decodedToken = decodeJwt(token);
-const userId = decodedToken._id;
 const App = () => {
   return (
     <>
       <Toaster position='bottom-right' toastOptions={{ duration: 2000 }} />
       <Routes>
-        <Route path="/" element={<HomePage />}/>
-        {userId && (
-          <Route path={`/app/${userId}`} element={<PrivateRoute><WorkSpace userId={userId} /></PrivateRoute>} />
-        )}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/app" element={<PrivateRoute><WorkSpace/></PrivateRoute>} />
         <Route path="/dashboard" element={<PrivateRoute><DashBoard /></PrivateRoute>} />
         <Route path="/register" element={<Registration />} />
         <Route path="/login" element={<Login />} />
