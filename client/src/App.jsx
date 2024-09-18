@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes, Navigate, useParams } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import WorkSpace from './pages/WorkSpace';
 import DashBoard from './pages/DashBoard';
@@ -13,8 +13,7 @@ axios.defaults.baseURL = 'https://taskly-backend-one.vercel.app';
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
 
-
-// PrivateRoute component
+// PrivateRoute component to protect routes
 const PrivateRoute = ({ children }) => {
   return localStorage.getItem('token') ? children : <Navigate to="/login" />;
 };
@@ -25,11 +24,14 @@ const App = () => {
       <Toaster position='bottom-right' toastOptions={{ duration: 2000 }} />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/app" element={<PrivateRoute><WorkSpace /></PrivateRoute>} />
-        <Route path="/dashboard" element={<PrivateRoute><DashBoard /></PrivateRoute>} />
         <Route path="/register" element={<Registration />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/calendar" element={<PrivateRoute><CalendarPage/></PrivateRoute>}/>
+
+        {/* Use dynamic userId in routes */}
+        <Route path="/app/:userId" element={<PrivateRoute><WorkSpace /></PrivateRoute>} />
+        <Route path="/dashboard/:userId" element={<PrivateRoute><DashBoard /></PrivateRoute>} />
+        <Route path="/calendar/:userId" element={<PrivateRoute><CalendarPage /></PrivateRoute>} />
+
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </>

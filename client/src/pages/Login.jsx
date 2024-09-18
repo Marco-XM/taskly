@@ -14,35 +14,37 @@ const Login = () => {
         navigate('/register')
     }
 
-const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    const { email, password } = data;
-
-    console.log('Submitting login with:', { email, password });
-
-    try {
-        const response = await fetch('https://taskly-backend-one.vercel.app/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-
-        console.log('Response status:', response.status);
-        const responseData = await response.json();
-        console.log('Response data:', responseData);
-
-        if (response.ok) {
-            localStorage.setItem('token', responseData.token);  // Store token
-            console.log('Login successful:', responseData);
-            navigate('/app');  // Navigate to the protected page after login
-        } else {
-            console.error('Login failed:', responseData.error || 'Unknown error');
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+    
+        const { email, password } = data;
+    
+        console.log('Submitting login with:', { email, password });
+    
+        try {
+            const response = await fetch('https://taskly-backend-one.vercel.app/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+    
+            console.log('Response status:', response.status);
+            const responseData = await response.json();
+            console.log('Response data:', responseData);
+    
+            if (response.ok) {
+                localStorage.setItem('token', responseData.token);  // Store token
+                const userId = responseData.user._id;  // Assuming the response contains a 'user' object with the '_id'
+                console.log('Login successful:', responseData);
+                navigate(`/app/${userId}`);  // Navigate to /app/:userId
+            } else {
+                console.error('Login failed:', responseData.error || 'Unknown error');
+            }
+        } catch (error) {
+            console.error('Failed to login:', error);
         }
-    } catch (error) {
-        console.error('Failed to login:', error);
-    }
-};
+    };
+    
 
 
     return (
