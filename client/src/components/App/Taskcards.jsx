@@ -14,7 +14,7 @@ import axios from 'axios';
 
 
 
-const Taskcards = ({ onCloseModal }) => {
+const Taskcards = ({ onCloseModal, task }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [editBoxModalOpen, setEditBoxModalOpen] = useState(false);
@@ -762,7 +762,8 @@ const Taskcards = ({ onCloseModal }) => {
             document.removeEventListener('click', handleClickOutside);
         };
     },);
-
+    const formattedStartDate = task.startDate ? format(new Date(task.startDate), 'MMMM dd, yyyy') : null;
+    const formattedEndDate = task.endDate ? format(new Date(task.endDate), 'MMMM dd, yyyy') : null;
     const renderTaskCards = () => (
         <>
                 {/* <SpeedInsights /> */}
@@ -864,12 +865,12 @@ const Taskcards = ({ onCloseModal }) => {
                                                 {task.name}
                                             </li>
                                             <p className='text-xs self-end text-white bg-gray-400 bg-opacity-20 p-1 rounded-xl'>
-                                                {task.startDate && task.endDate 
-                                                    ? `${task.startDate} : ${task.endDate}` 
-                                                    : (task.startDate 
-                                                        ? `Start: ${task.startDate}` 
-                                                        : (task.endDate 
-                                                            ? `End: ${task.endDate}` 
+                                                {formattedStartDate && formattedEndDate 
+                                                    ? `${formattedStartDate} : ${formattedEndDate}` 
+                                                    : (formattedStartDate 
+                                                        ? `Start: ${formattedStartDate}` 
+                                                        : (formattedEndDate 
+                                                            ? `End: ${formattedEndDate}` 
                                                             : ' ')
                                                     )
                                                 }
