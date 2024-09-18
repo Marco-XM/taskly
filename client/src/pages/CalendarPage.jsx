@@ -190,7 +190,8 @@ const CalendarPage = () => {
     
         // Log the event information
         console.log("FullCalendar event ID:", id);
-    
+        console.log("FullCalendar event object:", event);
+
         // Find the box containing the task
         const box = boxes.find(box => box.tasks.some(task => task._id === id));
         
