@@ -13,13 +13,14 @@ const CalendarPage = () => {
     const [view, setView] = useState('dayGridMonth'); // Initial view
     const calendarRef = useRef(null);
 
-    const token = localStorage.getItem('token');
-    const decodedToken = decodeJwt(token);
-    const userId = decodedToken._id;
+
 
     // Fetch tasks from localStorage and convert them into FullCalendar events
     useEffect(() => {
         const fetchTaskBoxes = async () => {
+            const token = localStorage.getItem('token');
+            const decodedToken = decodeJwt(token);
+            const userId = decodedToken._id;
             try {
                 const token = localStorage.getItem('token');
                 const response = await axios.get(`/api/task-boxes/${userId}`, {
@@ -32,7 +33,7 @@ const CalendarPage = () => {
         };
 
         fetchTaskBoxes();
-    }, [userId]);
+    }, []);
 
     // Sync events with the current state of `boxes`
     useEffect(() => {
