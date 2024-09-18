@@ -14,53 +14,36 @@ const Login = () => {
         navigate('/register')
     }
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();  // Prevent form from refreshing the page
-    
-        const { email, password } = data;
-    
-        // Basic validation
-        if (!email || !password) {
-            console.error('Email and password are required.');
-            return;
+const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const { email, password } = data;
+
+    console.log('Submitting login with:', { email, password });
+
+    try {
+        const response = await fetch('https://taskly-backend-one.vercel.app/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        console.log('Response status:', response.status);
+        const responseData = await response.json();
+        console.log('Response data:', responseData);
+
+        if (response.ok) {
+            localStorage.setItem('token', responseData.token);  // Store token
+            console.log('Login successful:', responseData);
+            navigate('/app');  // Navigate to the protected page after login
+        } else {
+            console.error('Login failed:', responseData.error || 'Unknown error');
         }
-    
-        console.log('Submitting login with:', { email, password });
-    
-        try {
-            // Send the login request to the backend
-            const response = await fetch('https://taskly-backend-one.vercel.app/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-            });
-    
-            // Check the response status
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Login failed:', errorData.message || 'Unknown error');
-                return;  // Stop execution if login fails
-            }
-    
-            // Parse the response data
-            const responseData = await response.json();
-            console.log('Response data:', responseData);
-    
-            // Store the token in localStorage
-            if (responseData.token) {
-                localStorage.setItem('token', responseData.token);
-                console.log('Login successful:', responseData);
-                
-                // Redirect the user to the protected page
-                navigate(`/app/${responseData.userId}`);  // Navigate to the dynamic app route
-            } else {
-                console.error('Token not found in response');
-            }
-        } catch (error) {
-            console.error('Failed to login:', error);
-        }
-    };
-    
+    } catch (error) {
+        console.error('Failed to login:', error);
+    }
+};
+
 
     return (
         <div className='grid gap-40 grid-rows-2'>
