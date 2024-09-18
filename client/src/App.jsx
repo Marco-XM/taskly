@@ -60,15 +60,15 @@ const decodeJwt = (token) => {
   return JSON.parse(decodedPayload);
 };
 
+const token = localStorage.getItem('token');
+const decodedToken = decodeJwt(token);
+const userId = decodedToken._id;
 const App = () => {
-  const token = localStorage.getItem('token');
-  const decodedToken = decodeJwt(token);
-  const userId = decodedToken._id;
   return (
     <>
       <Toaster position='bottom-right' toastOptions={{ duration: 2000 }} />
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<HomePage />}/>
         {userId && (
           <Route path={`/app/${userId}`} element={<PrivateRoute><WorkSpace userId={userId} /></PrivateRoute>} />
         )}
