@@ -4,6 +4,13 @@ import { useNavigate } from 'react-router-dom';
 const Registration = () => {
     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
     const [message, setMessage] = useState('');
+    const existingToken = localStorage.getItem('token');
+
+    if (existingToken) {
+        // Clear the existing token
+        localStorage.removeItem('token');
+        console.log('Existing session cleared');
+    }
 
     const navigat = useNavigate()
 
@@ -14,13 +21,6 @@ const Registration = () => {
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
-    const existingToken = localStorage.getItem('token');
-
-    if (existingToken) {
-        // Clear the existing token
-        localStorage.removeItem('token');
-        console.log('Existing session cleared');
-    }
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
