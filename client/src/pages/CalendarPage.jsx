@@ -131,7 +131,7 @@ const CalendarPage = () => {
     
 
     // Handle event date and time changes (dragging, resizing, or editing)
-    const handleEventChange = (changeInfo) => {
+    const handleEventChange = async (changeInfo) => {
         const { event } = changeInfo;
         const { id, start, end } = event;
     
@@ -154,9 +154,8 @@ const CalendarPage = () => {
             })
         }));
     
-        // Update state and localStorage
+        // Update state
         setBoxes(updatedBoxes);
-        localStorage.setItem('taskBoxes', JSON.stringify(updatedBoxes));
     
         // Update FullCalendar events
         const updatedEvents = events.map(ev => {
@@ -171,7 +170,27 @@ const CalendarPage = () => {
         });
     
         setEvents(updatedEvents);
+    
+        // Send updated task to the backend
+        try {
+            const token = localStorage.getItem('token');
+            const decodedToken = decodeJwt(token);
+            const userId = decodedToken._id;
+    
+            const boxId = boxes.find(box => box.tasks.some(task => task.id === id))._id;
+            const taskId = id;
+    
+            await axios.put(
+                `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}`,
+                { startDate: formattedStart, endDate: formattedEnd },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        } catch (error) {
+            console.error('Error updating task in database:', error.response?.data || error);
+        }
     };
+    
+    
     
     
 
