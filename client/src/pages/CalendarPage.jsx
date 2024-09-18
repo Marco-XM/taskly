@@ -180,64 +180,79 @@ const CalendarPage = () => {
     //     setEvents(updatedEvents);
     // };
 
-const handleEventChange = async (changeInfo) => {
-    const { event } = changeInfo;
-    const { id, start, end } = event; // This 'id' comes from FullCalendar, ensure it matches the task's _id
-    const updatedEvent = changeInfo.event;
-
-    console.log('Updated Task ID:', updatedEvent.id);
-
-    // Format the dates if necessary
-    const formattedStart = formatDate(start);
-    const formattedEnd = end ? formatDate(end) : formattedStart;
-    console.log('Updated Task1 ID:', updatedEvent.id);
-
-    // Update the task in `boxes`
-    const updatedBoxes = boxes.map(box => ({
-        ...box,
-        tasks: box.tasks.map(task => {
-            if (task._id === id) { // Use task._id instead of task.id
+    const handleEventChange = async (changeInfo) => {
+        const { event } = changeInfo;
+        const { id, start, end } = event;
+    
+        // Format the start and end dates
+        const formattedStart = formatDate(start);
+        const formattedEnd = end ? formatDate(end) : formattedStart;
+    
+        // Log the event information
+        console.log("FullCalendar event ID:", id);
+    
+        // Find the box containing the task
+        const box = boxes.find(box => box.tasks.some(task => task._id === id));
+        
+        if (!box) {
+            console.error('Box containing the task not found');
+            return;
+        }
+    
+        const boxId = box._id;
+        const taskId = id; // This is the FullCalendar task ID
+    
+        // Log the box and task IDs
+        console.log("TaskBox ID:", boxId);
+        console.log("Task ID:", taskId);
+    
+        // Update state (tasks in boxes)
+        const updatedBoxes = boxes.map(box => ({
+            ...box,
+            tasks: box.tasks.map(task => {
+                if (task._id === id) {
+                    return {
+                        ...task,
+                        startDate: formattedStart,
+                        endDate: formattedEnd,
+                    };
+                }
+                return task;
+            })
+        }));
+    
+        setBoxes(updatedBoxes); // Update the state
+    
+        // Update FullCalendar events
+        const updatedEvents = events.map(ev => {
+            if (ev.id === id) {
                 return {
-                    ...task,
-                    startDate: formattedStart,
-                    endDate: formattedEnd,
+                    ...ev,
+                    start,
+                    end: end || start,
                 };
             }
-            return task;
-        })
-    }));
-    console.log('Updated Task2 ID:', updatedEvent.id);
-
-    // Find the box containing the task
-    const box = boxes.find(box => box.tasks.some(task => task._id === id)); // Use task._id here as well
-
-    if (!box) {
-        console.error(`Box containing task with _id ${id} not found`);
-        return;
-    }
-    console.log('Updated Task3 ID:', updatedEvent.id);
-
-    const boxId = box._id; // Use the box's MongoDB _id
-    const taskId = id; // Use the FullCalendar event id, which should correspond to task._id
-    console.log(taskId)
-    // Send the updated task details to the backend
-    try {
-        const token = localStorage.getItem('token');
-        const decodedToken = decodeJwt(token);
-        const userId = decodedToken._id;
-
-        await axios.put(
-            `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}/update-date`,
-            { startDate: formattedStart, endDate: formattedEnd },
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
-    } catch (error) {
-        console.error('Error updating task in database:', error.response?.data || error);
-    }
-
-    // Update the boxes state to reflect the changes
-    setBoxes(updatedBoxes);
-};
+            return ev;
+        });
+    
+        setEvents(updatedEvents);
+    
+        // Send the updated task data to the backend
+        try {
+            const token = localStorage.getItem('token');
+            const decodedToken = decodeJwt(token);
+            const userId = decodedToken._id;
+    
+            await axios.put(
+                `/api/task-boxes/${userId}/${boxId}/tasks/${taskId}/update-date`,
+                { startDate: formattedStart, endDate: formattedEnd },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        } catch (error) {
+            console.error('Error updating task in the database:', error.response?.data || error);
+        }
+    };
+    
 
     
     
