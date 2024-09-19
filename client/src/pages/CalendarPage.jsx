@@ -5,11 +5,14 @@ import timeGridPlugin from '@fullcalendar/timegrid'; // For time adjustment
 import interactionPlugin from '@fullcalendar/interaction';
 import ViewOptions from '../components/Calendar/ViewOptions';
 import axios from 'axios';
+import Loading from '../components/App/loading';
+
 
 const CalendarPage = () => {
     const [boxes, setBoxes] = useState([]); // State to hold task boxes
     const [events, setEvents] = useState([]); // State for calendar events
     const [selectedDate, setSelectedDate] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [view, setView] = useState('dayGridMonth'); // Initial view
     const calendarRef = useRef(null);
 
@@ -72,6 +75,7 @@ const CalendarPage = () => {
     
                 setBoxes(fetchedBoxes);
                 setEvents(fullCalendarEvents);
+                setIsLoading(false);
             } catch (error) {
                 console.error('Error fetching tasks from database:', error);
             }
@@ -99,7 +103,9 @@ const CalendarPage = () => {
         setEvents(taskEvents);
     }, [boxes]);
     
-    
+    if (isLoading) {
+        return <Loading></Loading>
+    }
 
     const handleView = (newView) => {
         setView(newView);
