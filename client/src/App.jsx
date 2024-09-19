@@ -65,7 +65,8 @@ const App = () => {
         <PrivateRoute>
             <WorkSpace />
         </PrivateRoute>
-    } />        <Route path="/dashboard" element={<DashBoard />} />
+        } />
+        <Route path="/dashboard" element={<DashBoard />} />
         <Route path="/register" element={<Registration />} />
         <Route path="/login" element={<Login />} />
         <Route path="/calendar" element={<CalendarPage/>}/>
