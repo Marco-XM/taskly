@@ -40,6 +40,7 @@ const decodeJwt = (token) => {
 
 // Safely retrieve the token and decode it
 const token = localStorage.getItem('token');
+
 let userId = null;
 if (token) {
   try {
@@ -49,12 +50,14 @@ if (token) {
     console.error('Failed to decode JWT:', error);
   }
 }
-console.log(userId)
+
 
 
 
 
 const App = () => {
+  const decodedToken = decodeJwt(token);
+  userId = decodedToken._id; // Assuming the token contains _id
   return (
     <>
       <Toaster position='bottom-right' toastOptions={{ duration: 2000 }} />
