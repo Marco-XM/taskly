@@ -30,6 +30,7 @@ const base64UrlDecode = (str) => {
 };
 
 const decodeJwt = (token) => {
+  PrivateRoute();
   const parts = token.split('.');
   if (parts.length !== 3) {
       throw new Error('JWT does not have 3 parts');
