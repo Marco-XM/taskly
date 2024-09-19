@@ -38,7 +38,7 @@ const Taskcards = ({ onCloseModal }) => {
     ];
     const [boxes, setBoxes] = useState(() => {
         const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
-        return savedBoxes || <Loading/>;
+        return savedBoxes;
     });
 
     // const [boxes, setBoxes] = useState([]);
@@ -64,6 +64,10 @@ const Taskcards = ({ onCloseModal }) => {
     
         fetchBoxes();
     }, []);  // Run only on component mount
+
+    if (isLoading) {
+        return <Loading />;  // Show loading spinner while data is loading
+    }
 
     // Save task boxes to localStorage whenever they change
     // useEffect(() => {
