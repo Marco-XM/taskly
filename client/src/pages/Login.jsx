@@ -35,7 +35,7 @@ const handleSubmit = async (event) => {
         if (response.ok) {
             localStorage.setItem('token', responseData.token);  // Store token
             console.log('Login successful:', responseData);
-            navigate('/app');  // Navigate to the protected page after login
+            navigate(`/app/${responseData.user._id}`);  // Navigate to the protected page after login
         } else {
             console.error('Login failed:', responseData.error || 'Unknown error');
         }
