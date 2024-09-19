@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate, useNavigate } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import WorkSpace from './pages/WorkSpace';
 import DashBoard from './pages/DashBoard';
@@ -13,15 +13,29 @@ axios.defaults.baseURL = 'https://taskly-backend-one.vercel.app';
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
 
-// Helper function for JWT decoding
+
+const PrivateRoute = ({ children }) => {
+  return localStorage.getItem('token') ? children : <Navigate to="/login" />;
+};
+
+// Helper functions for JWT decoding
+const base64UrlDecode = (str) => {
+  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  while (base64.length % 4 !== 0) {
+    base64 += '=';
+  }
+  return atob(base64);
+};
+
 const decodeJwt = (token) => {
   const parts = token.split('.');
   if (parts.length !== 3) {
     throw new Error('JWT does not have 3 parts');
   }
 
-  const payload = atob(parts[1]);
-  return JSON.parse(payload);
+  const payload = parts[1];
+  const decodedPayload = base64UrlDecode(payload);
+  return JSON.parse(decodedPayload);
 };
 
 // Safely retrieve the token and decode it
@@ -30,39 +44,27 @@ let userId = null;
 if (token) {
   try {
     const decodedToken = decodeJwt(token);
-    userId = decodedToken._id;  // Assuming the token contains _id
+    userId = decodedToken._id; // Assuming the token contains _id
   } catch (error) {
     console.error('Failed to decode JWT:', error);
   }
 }
 
-// PrivateRoute component for protecting authenticated routes
-const PrivateRoute = ({ children }) => {
-  return localStorage.getItem('token') ? children : <Navigate to="/login" />;
-};
+
+
+
 
 const App = () => {
-  const navigate = useNavigate();
-
-  // Redirect to /app/:userId after login or registration
-  const handleRedirect = () => {
-    if (userId) {
-      navigate(`/app/${userId}`);
-    }
-  };
-
   return (
     <>
-      <Toaster position="bottom-right" toastOptions={{ duration: 2000 }} />
+      <Toaster position='bottom-right' toastOptions={{ duration: 2000 }} />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        {userId && (
-          <Route path={`/app/${userId}`} element={<PrivateRoute><WorkSpace /></PrivateRoute>} />
-        )}
-        <Route path="/dashboard" element={<PrivateRoute><DashBoard /></PrivateRoute>} />
+        <Route path={`/app/${userId}`} element={<PrivateRoute><WorkSpace/></PrivateRoute>} />
+        <Route path="/dashboard" element={<DashBoard />} />
         <Route path="/register" element={<Registration />} />
-        <Route path="/login" element={<Login onLogin={handleRedirect} />} />
-        <Route path="/calendar" element={<PrivateRoute><CalendarPage /></PrivateRoute>} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/calendar" element={<CalendarPage/>}/>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </>
