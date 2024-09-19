@@ -65,9 +65,7 @@ const Taskcards = ({ onCloseModal }) => {
         fetchBoxes();
     }, []);  // Run only on component mount
 
-    if (isLoading) {
-        return <Loading />;  // Show loading spinner while data is loading
-    }
+
 
     // Save task boxes to localStorage whenever they change
     // useEffect(() => {
@@ -766,7 +764,9 @@ const Taskcards = ({ onCloseModal }) => {
             document.removeEventListener('click', handleClickOutside);
         };
     },);
-
+    if (isLoading) {
+        return <Loading />;  // Show loading spinner while data is loading
+    }
     const renderTaskCards = () => (
         <>
                 {/* <SpeedInsights /> */}
