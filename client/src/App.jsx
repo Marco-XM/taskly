@@ -14,26 +14,23 @@ axios.defaults.withCredentials = true;
 axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
 
 
-// PrivateRoute component
 const PrivateRoute = ({ children }) => {
   return localStorage.getItem('token') ? children : <Navigate to="/login" />;
 };
+
+// Helper functions for JWT decoding
 const base64UrlDecode = (str) => {
-  // Convert Base64Url to Base64
   let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
-  // Pad Base64 string if necessary
   while (base64.length % 4 !== 0) {
-      base64 += '=';
+    base64 += '=';
   }
-  // Decode Base64 string to a string
   return atob(base64);
 };
 
 const decodeJwt = (token) => {
-  PrivateRoute();
   const parts = token.split('.');
   if (parts.length !== 3) {
-      throw new Error('JWT does not have 3 parts');
+    throw new Error('JWT does not have 3 parts');
   }
 
   const payload = parts[1];
@@ -41,9 +38,17 @@ const decodeJwt = (token) => {
   return JSON.parse(decodedPayload);
 };
 
+// Safely retrieve the token and decode it
 const token = localStorage.getItem('token');
-const decodedToken = decodeJwt(token);
-const userId = decodedToken._id;
+let userId = null;
+if (token) {
+  try {
+    const decodedToken = decodeJwt(token);
+    userId = decodedToken._id; // Assuming the token contains _id
+  } catch (error) {
+    console.error('Failed to decode JWT:', error);
+  }
+}
 
 
 
