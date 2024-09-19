@@ -103,9 +103,7 @@ const CalendarPage = () => {
         setEvents(taskEvents);
     }, [boxes]);
     
-    if (isLoading) {
-        return <Loading></Loading>
-    }
+
 
     const handleView = (newView) => {
         setView(newView);
@@ -255,6 +253,10 @@ const CalendarPage = () => {
             console.error('Error updating task in the database:', error.response?.data || error);
         }
     };
+
+    if (isLoading) {
+        return <Loading></Loading>
+    }
 
     return (
         <div className='calendar-page flex w-full h-screen'>
