@@ -56,7 +56,6 @@ const Taskcards = ({ onCloseModal }) => {
                 });
     
                 setBoxes(response.data);
-                setIsLoading(false);  // Turn off loading once data is fetched
             } catch (error) {
                 console.error('Error fetching task boxes:', error.response?.data || error);
             }
@@ -64,8 +63,6 @@ const Taskcards = ({ onCloseModal }) => {
     
         fetchBoxes();
     }, []);  // Run only on component mount
-
-    
 
     // Save task boxes to localStorage whenever they change
     // useEffect(() => {
