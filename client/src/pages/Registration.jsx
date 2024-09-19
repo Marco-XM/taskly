@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import "./input.css"
 
 
 const Registration = () => {
@@ -63,7 +64,7 @@ const Registration = () => {
             setMessage('An error occurred');
         }
     };
-    const className="text-white m-4 p-5 bg-red-50 bg-opacity-0 border-b"
+    const className="text-white m-2 p-5 bg-red-50 bg-opacity-0 rounded-xl"
     return (
         <div className='grid grid-rows-2'>
             <div className='flex justify-center m-10'>
@@ -81,6 +82,7 @@ const Registration = () => {
                             required 
                             className={className}
                         />
+                        <div className='border'></div>
                         <input 
                             type="email" 
                             name="email" 
@@ -90,6 +92,7 @@ const Registration = () => {
                             required 
                             className={className}
                         />
+                        <div className='border'></div>
                         <input 
                             type="password" 
                             name="password" 
@@ -99,7 +102,8 @@ const Registration = () => {
                             required 
                             className={className}
                         />
-                        <div className='flex justify-between'>
+                        <div className='border'></div>
+                        <div className='flex justify-between mt-7'>
                             <button type="submit">Signup</button>
                             <div className='flex flex-col justify-self-end'>
                                 <button type="button" onClick={routeLogin}>Login</button>

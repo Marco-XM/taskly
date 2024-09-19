@@ -1,0 +1,28 @@
+/* Apply custom styles to autofilled inputs */
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 0px transparent inset !important;
+    box-shadow: 0 0 0px 1px transparent inset !important;
+    -webkit-text-fill-color: white !important; /* White text */
+    transition: background-color 5000s ease-in-out 0s; 
+}
+
+  /* For input elements when autofill is active */
+input:-webkit-autofill:focus {
+    background-color: rgba(255, 255, 255, 0) !important; /* Transparent background on focus */
+    transition: 5000s ease-in-out 0s;
+    -webkit-box-shadow: 0 0 10px 1000px white inset;  /* Adjust this to match your design */
+    border: none !important;
+    outline: none !important;
+}
+
+input:-webkit-autofill:hover {
+    background-color: rgba(255, 255, 255, 0) !important; /* Transparent background on focus */
+    -webkit-box-shadow: 0 0 0px 1000px white inset;
+}
+
+input:-webkit-autofill:active {
+    background-color: rgba(255, 255, 255, 0) !important; /* Transparent background on focus */
+    -webkit-box-shadow: 0 0 0px 1000px white inset;
+    border: none !important;
+    outline: none !important;
+}

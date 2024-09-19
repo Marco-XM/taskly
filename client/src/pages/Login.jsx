@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import "./input.css"
 
 const Login = () => {
 
@@ -75,19 +76,21 @@ const handleSubmit = async (event) => {
                 <form onSubmit={handleSubmit} className='flex flex-col'>
                     <input 
                         type="email" 
-                        className="text-white m-4 p-5 bg-red-50 bg-opacity-0 border-b" 
+                        className="text-white m-2 p-5 bg-red-50 bg-opacity-0 rounded-xl" 
                         placeholder='Enter email...' 
                         value={data.email} 
                         onChange={(e) => setData({...data, email: e.target.value})}
                     />
+                    <div className='border'></div>
                     <input 
                         type="password" 
-                        className="text-white m-4 p-5 bg-red-50 bg-opacity-0 border-b" 
+                        className="text-white m-2 p-5 bg-red-50 bg-opacity-0 rounded-xl" 
                         placeholder='Enter password' 
                         value={data.password} 
                         onChange={(e) => setData({...data, password: e.target.value})}
                     />
-                    <div className='flex justify-between'>
+                    <div className='border'></div>
+                    <div className='flex justify-between mt-10'>
                         <button type='submit'>Login</button>
                         <button type='button' onClick={routeRegister}>Signup</button>
                     </div>
