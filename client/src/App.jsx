@@ -60,7 +60,7 @@ const App = () => {
       <Toaster position='bottom-right' toastOptions={{ duration: 2000 }} />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path={`/app/${userId}`} element={<PrivateRoute><WorkSpace /></PrivateRoute>} />
+        <Route path={`/app/${userId}`} element={<PrivateRoute><WorkSpace/></PrivateRoute>} />
         <Route path="/dashboard" element={<DashBoard />} />
         <Route path="/register" element={<Registration />} />
         <Route path="/login" element={<Login />} />

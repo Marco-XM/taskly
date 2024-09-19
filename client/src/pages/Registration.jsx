@@ -40,13 +40,11 @@ const Registration = () => {
                     }
                     return atob(base64);
                 };
-    
                 const decodeJwt = (token) => {
                     const parts = token.split('.');
                     if (parts.length !== 3) {
                     throw new Error('JWT does not have 3 parts');
                     }
-    
                     const payload = parts[1];
                     const decodedPayload = base64UrlDecode(payload);
                     return JSON.parse(decodedPayload);
@@ -54,6 +52,7 @@ const Registration = () => {
                 const token = localStorage.getItem('token');
                 const decodedToken = decodeJwt(token);
                 const userId = decodedToken._id;
+                console.log('Decoded userId:', userId);
                 navigate(`/app/${userId}`);             
             } else {
                 setMessage(responseData.error);
