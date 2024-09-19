@@ -38,7 +38,7 @@ const Taskcards = ({ onCloseModal }) => {
     ];
     const [boxes, setBoxes] = useState(() => {
         const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
-        return savedBoxes;
+        return savedBoxes || initialBoxes;
     });
 
     // const [boxes, setBoxes] = useState([]);
