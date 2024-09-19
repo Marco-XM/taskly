@@ -11,7 +11,6 @@ import BoxListOptions from './BoxListOptions';
 import ColorPicker from './ColorPicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
-import loading from './loading';
 import Loading from './loading';
 
 
@@ -39,7 +38,7 @@ const Taskcards = ({ onCloseModal }) => {
     ];
     const [boxes, setBoxes] = useState(() => {
         const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
-        return savedBoxes || <Loading/>;
+        return savedBoxes;
     });
 
     // const [boxes, setBoxes] = useState([]);
@@ -763,6 +762,10 @@ const Taskcards = ({ onCloseModal }) => {
             document.removeEventListener('click', handleClickOutside);
         };
     },);
+
+    if (isLoading) {
+        return <Loading/>
+    }
 
     const renderTaskCards = () => (
         <>
