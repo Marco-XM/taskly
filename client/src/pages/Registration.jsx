@@ -24,15 +24,37 @@ const Registration = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('https://taskly-backend-one.vercel.app/authanticate/register', {
+            const response = await fetch('https://taskly-backend-one.vercel.app/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             });
-            const data = await response.json();
+            const responseData = await response.json();
             if (response.ok) {
-                navigat('/app');
-            } else {
+                localStorage.setItem('token', responseData.token);  // Store token
+                console.log('Login successful:', responseData);
+                const base64UrlDecode = (str) => {
+                    let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+                    while (base64.length % 4 !== 0) {
+                    base64 += '=';
+                    }
+                    return atob(base64);
+                };
+    
+                const decodeJwt = (token) => {
+                    const parts = token.split('.');
+                    if (parts.length !== 3) {
+                    throw new Error('JWT does not have 3 parts');
+                    }
+    
+                    const payload = parts[1];
+                    const decodedPayload = base64UrlDecode(payload);
+                    return JSON.parse(decodedPayload);
+                };
+                const token = localStorage.getItem('token');
+                const decodedToken = decodeJwt(token);
+                const userId = decodedToken._id;
+                navigat(`/app/${userId}`);             } else {
                 setMessage(data.error);
             }
         } catch (error) {
