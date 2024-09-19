@@ -49,7 +49,7 @@ if (token) {
     console.error('Failed to decode JWT:', error);
   }
 }
-
+console.log(userId)
 
 
 
