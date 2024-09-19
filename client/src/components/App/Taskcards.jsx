@@ -56,7 +56,7 @@ const Taskcards = ({ onCloseModal }) => {
                 });
     
                 setBoxes(response.data);
-                // setIsLoading(false);
+                setIsLoading(false);
             } catch (error) {
                 console.error('Error fetching task boxes:', error.response?.data || error);
             }
