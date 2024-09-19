@@ -54,8 +54,9 @@ const Registration = () => {
                 const token = localStorage.getItem('token');
                 const decodedToken = decodeJwt(token);
                 const userId = decodedToken._id;
-                navigat(`/app/${userId}`);             } else {
-                setMessage(data.error);
+                navigat(`/app/${userId}`);             
+            } else {
+                setMessage(responseData.error);
             }
         } catch (error) {
             console.error('Error:', error);
