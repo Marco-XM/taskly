@@ -35,7 +35,28 @@ const handleSubmit = async (event) => {
         if (response.ok) {
             localStorage.setItem('token', responseData.token);  // Store token
             console.log('Login successful:', responseData);
-            navigate(`/app/${responseData.user._id}`);  // Navigate to the protected page after login
+            const base64UrlDecode = (str) => {
+                let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+                while (base64.length % 4 !== 0) {
+                  base64 += '=';
+                }
+                return atob(base64);
+              };
+              
+              const decodeJwt = (token) => {
+                const parts = token.split('.');
+                if (parts.length !== 3) {
+                  throw new Error('JWT does not have 3 parts');
+                }
+              
+                const payload = parts[1];
+                const decodedPayload = base64UrlDecode(payload);
+                return JSON.parse(decodedPayload);
+              };
+              const token = localStorage.getItem('token');
+              const decodedToken = decodeJwt(token);
+              const userId = decodedToken._id;
+            navigate(`/app/${userId}`);  // Navigate to the protected page after login
         } else {
             console.error('Login failed:', responseData.error || 'Unknown error');
         }
