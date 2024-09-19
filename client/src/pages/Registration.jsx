@@ -24,7 +24,7 @@ const Registration = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('https://taskly-backend-one.vercel.app/register', {
+            const response = await fetch('https://taskly-backend-one.vercel.app/authanticate/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)

@@ -22,7 +22,7 @@ const handleSubmit = async (event) => {
     console.log('Submitting login with:', { email, password });
 
     try {
-        const response = await fetch('https://taskly-backend-one.vercel.app/login', {
+        const response = await fetch('https://taskly-backend-one.vercel.app/authanticate/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
