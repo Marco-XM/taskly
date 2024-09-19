@@ -50,14 +50,14 @@ if (token) {
     console.error('Failed to decode JWT:', error);
   }
 }
+const decodedToken = decodeJwt(token);
+userId = decodedToken._id; // Assuming the token contains _id
 
 
 
 
 
 const App = () => {
-  const decodedToken = decodeJwt(token);
-  userId = decodedToken._id; // Assuming the token contains _id
   return (
     <>
       <Toaster position='bottom-right' toastOptions={{ duration: 2000 }} />
