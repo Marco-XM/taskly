@@ -1,6 +1,5 @@
 // Loading.js
 import React from 'react';
-import 
 
 const Loading = () => {
     return (
