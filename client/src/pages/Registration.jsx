@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Registration = () => {
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
     const [message, setMessage] = useState('');
     const existingToken = localStorage.getItem('token');
@@ -12,7 +14,6 @@ const Registration = () => {
         console.log('Existing session cleared');
     }
 
-    const navigate = useNavigate()
 
     const routeLogin = () => {
         navigate('/login')
