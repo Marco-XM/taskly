@@ -12,10 +12,10 @@ const Registration = () => {
         console.log('Existing session cleared');
     }
 
-    const navigat = useNavigate()
+    const navigate = useNavigate()
 
     const routeLogin = () => {
-        navigat('/login')
+        navigate('/login')
     }
 
     const handleChange = (e) => {
@@ -32,7 +32,7 @@ const Registration = () => {
             const responseData = await response.json();
             if (response.ok) {
                 localStorage.setItem('token', responseData.token);  // Store token
-                console.log('Login successful:', responseData);
+                console.log('Signed Up successful:', responseData);
                 const base64UrlDecode = (str) => {
                     let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
                     while (base64.length % 4 !== 0) {
@@ -54,7 +54,7 @@ const Registration = () => {
                 const token = localStorage.getItem('token');
                 const decodedToken = decodeJwt(token);
                 const userId = decodedToken._id;
-                navigat(`/app/${userId}`);             
+                navigate(`/app/${userId}`);             
             } else {
                 setMessage(responseData.error);
             }
