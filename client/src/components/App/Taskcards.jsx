@@ -11,6 +11,7 @@ import BoxListOptions from './BoxListOptions';
 import ColorPicker from './ColorPicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
+import Loading from './loading';
 
 
 
@@ -25,6 +26,7 @@ const Taskcards = ({ onCloseModal }) => {
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
     const [selectedColor, setSelectedColor] = useState("#aabbcc");
     const [dragImage, setDragImage] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
     const editFormRef = useRef(null);
     const navigate = useNavigate();
     
@@ -36,7 +38,7 @@ const Taskcards = ({ onCloseModal }) => {
     ];
     const [boxes, setBoxes] = useState(() => {
         const savedBoxes = JSON.parse(localStorage.getItem('taskBoxes'));
-        return savedBoxes || initialBoxes;
+        return savedBoxes || <Loading/>;
     });
 
     // const [boxes, setBoxes] = useState([]);
@@ -54,6 +56,7 @@ const Taskcards = ({ onCloseModal }) => {
                 });
     
                 setBoxes(response.data);
+                setIsLoading(false);  // Turn off loading once data is fetched
             } catch (error) {
                 console.error('Error fetching task boxes:', error.response?.data || error);
             }
