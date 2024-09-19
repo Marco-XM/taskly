@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes, Navigate, useNavigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import WorkSpace from './pages/WorkSpace';
 import DashBoard from './pages/DashBoard';
@@ -55,6 +55,15 @@ if (token) {
 
 
 const App = () => {
+
+  const navigate = useNavigate();
+
+  // Redirect to /app/:userId after login or registration
+  const handleRedirect = () => {
+    if (userId) {
+      navigate(`/app/${userId}`);
+    }
+  };
   return (
     <>
       <Toaster position='bottom-right' toastOptions={{ duration: 2000 }} />
