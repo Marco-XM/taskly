@@ -27,16 +27,16 @@ const HomePage = () => {
     return (
         <>
             <div className="flex p-7 justify-between sm:text-xs md:text-lg lg:text-xl bg-slate-400 bg-opacity-0">
-                <h1 className="self-center font-bold lg:text-3xl md:text-2xl sm:text-xl">taskly.</h1>
-                <nav className="hidden lg:flex lg:text-lg p-5 absolute right-0 self-center md:text-sm md:flex ">
-                    <Header className="flex m-8 self-center max-w-20" />
+                <h1 className="self-center font-bold ">taskly.</h1>
+                <nav className="hidden lg:flex text-sm p-5 absolute right-0 self-center md:flex ">
+                    <Header className="flex m-8 self-center max-w-20 text-md hover:text-gray-300 transition-all duration-300 hover:scale-110 ease-in-out" />
                     {/* Conditionally render Join or Sign Out based on login status */}
                     {isLoggedIn ? (
-                        <button onClick={handleSignOut} className="m-8 bg-red-300 p-5 rounded-full">
+                        <button onClick={handleSignOut} className="m-8 bg-red-600 p-5 rounded-full hover:text-gray-300 transition-all duration-300 hover:scale-110 ease-in-out">
                             Sign Out
                         </button>
                     ) : (
-                        <Join className="m-8 bg-red-300 bg-opacity-0 border p-5 rounded-full" />
+                        <Join className="m-8 bg-red-300 bg-opacity-0 border p-5 rounded-3xl hover:text-gray-300 hover:border-gray-500 transition-all duration-300 hover:scale-110 ease-in-out" />
                     )}
                 </nav>
                 <div className="menu-container lg:-z-20 md:-z-20">
@@ -74,10 +74,10 @@ const HomePage = () => {
                 </div>
                 <div className="p-5 w-1/2 self-center">
                     <div className="flex justify-center">
-                        <img src="../../img/social-planner-calendar-for-time-management.png" alt="" />
+                        <img src="../../public/social-planner-calendar-for-time-management.png" alt="taskly" />
                     </div>
                     <div className="flex justify-center">
-                        Illustration by <a href="https://icons8.com/illustrations/author/HxMFjfKZdNq2">Rosina Gavrilash</a> from <a href="https://icons8.com/illustrations">Ouch!</a>
+                        {/* Illustration by <a href="https://icons8.com/illustrations/author/HxMFjfKZdNq2">Rosina Gavrilash</a> from <a href="https://icons8.com/illustrations">Ouch!</a> */}
                     </div>
                 </div>
             </div>
