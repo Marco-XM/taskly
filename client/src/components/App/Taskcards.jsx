@@ -863,11 +863,11 @@ const Taskcards = ({ onCloseModal }) => {
                                     className="task-item flex justify-between my-5 rounded-2xl p-5 bg-gray-700 bg-opacity-30 transition-all"
                                     onContextMenu={(e) => handleContextMenu(e, index, taskIndex)}
                                     onDragEnd={handleDragEnd}>
-                                        <div className='flex flex-col'>
+                                        <div className='flex flex-col overflow-hidden break-all'>
                                             <li className='overflow-hidden border-b m-2 p-1 self-start transition-all'>
                                                 {task.name}
                                             </li>
-                                            <p className='text-xs self-end text-white bg-gray-400 bg-opacity-20 p-1 rounded-xl'>
+                                            <p className='text-xs self-start text-white bg-gray-400 bg-opacity-20 p-1 rounded-xl'>
                                                 {task.startDate && task.endDate 
                                                     ? `${task.startDate} : ${task.endDate}` 
                                                     : (task.startDate 

@@ -326,10 +326,16 @@ const CalendarPage = () => {
                         } else {
                           // Handle events with both start and end dates
                             eventContent = `
-                                <div class="p-2 bg-gray-500 w-fit rounded-xl bg-opacity-40">
-                                    <strong>|${info.event.title}</strong><br/>
-                                    <small>Start: ${formattedStartDate}</small><br/>
-                                    <small>End: ${formattedEndDate}</small>
+                                <div class="rounded-xl overflow-hidden">
+                                    <div class="bg-gray-400 p-2 w-fit rounded-xl bg-opacity-50">
+                                        <div class="flex items-center self-start">
+                                            <span class="p-1 rounded-full mr-2" style="background-color: ${color};"></span>
+                                            <p class="font-bold">| ${info.event.title}</p><br/>
+                                        </div>
+                                        <div class="border"></div>
+                                        <small>Start: ${formattedStartDate}</small><br/>
+                                        <small>End: ${formattedEndDate}</small>
+                                    </div>
                                 </div>
                             `;
                         }
