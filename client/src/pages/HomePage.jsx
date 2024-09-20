@@ -68,7 +68,7 @@ const HomePage = () => {
                     <div className="break-words flex flex-col justify-center">
                         <h1 className="text-5xl font-bold mb-4">Welcome to Taskly!</h1>
                         <p className="text-lg text-gray-400">
-                            Stay organized and manage your tasks effortlessly. Start by creating your task boxes and adding tasks to them.
+                            Stay organized and manage your tasks effortlessly.<br/> Start by creating your task boxes and adding tasks to them.
                         </p>
                     </div>
                 </div>
