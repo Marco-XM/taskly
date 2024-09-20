@@ -26,7 +26,7 @@ const HomePage = () => {
 
     return (
         <>
-            <div className="flex p-4 justify-between sm:text-xs md:text-lg lg:text-xl bg-slate-400">
+            <div className="flex p-7 justify-between sm:text-xs md:text-lg lg:text-xl bg-slate-400 bg-opacity-0">
                 <h1 className="self-center font-bold lg:text-3xl md:text-2xl sm:text-xl">taskly.</h1>
                 <nav className="hidden lg:flex lg:text-lg p-5 absolute right-0 self-center md:text-sm md:flex ">
                     <Header className="flex m-8 self-center max-w-20" />
@@ -36,7 +36,7 @@ const HomePage = () => {
                             Sign Out
                         </button>
                     ) : (
-                        <Join className="m-8 bg-red-300 p-5 rounded-full" />
+                        <Join className="m-8 bg-red-300 bg-opacity-0 border p-5 rounded-full" />
                     )}
                 </nav>
                 <div className="menu-container lg:-z-20 md:-z-20">
@@ -62,6 +62,25 @@ const HomePage = () => {
                     </nav>
                 </div>
             )}
+            <div className="border"></div>
+            <div className="h-screen flex">
+                <div className="p-5 w-1/2 self-center font-bold text-2xl flex justify-center">
+                    <div className="break-words flex flex-col justify-center">
+                        <h1 className="text-5xl font-bold mb-4">Welcome to Taskly!</h1>
+                        <p className="text-lg text-gray-400">
+                            Stay organized and manage your tasks effortlessly. Start by creating your task boxes and adding tasks to them.
+                        </p>
+                    </div>
+                </div>
+                <div className="p-5 w-1/2 self-center">
+                    <div className="flex justify-center">
+                        <img src="../../img/social-planner-calendar-for-time-management.png" alt="" />
+                    </div>
+                    <div className="flex justify-center">
+                        Illustration by <a href="https://icons8.com/illustrations/author/HxMFjfKZdNq2">Rosina Gavrilash</a> from <a href="https://icons8.com/illustrations">Ouch!</a>
+                    </div>
+                </div>
+            </div>
         </>
     );
 };
