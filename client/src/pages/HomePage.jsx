@@ -74,7 +74,7 @@ const HomePage = () => {
                 </div>
                 <div className="p-5 w-1/2 self-center">
                     <div className="flex justify-center">
-                        <img src="/social-planner-calendar-for-time-management.png" alt="image" />
+                        <img src="/planner.png" alt="image" />
                     </div>
                     <div className="flex justify-center">
                         {/* Illustration by <a href="https://icons8.com/illustrations/author/HxMFjfKZdNq2">Rosina Gavrilash</a> from <a href="https://icons8.com/illustrations">Ouch!</a> */}
