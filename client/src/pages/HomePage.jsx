@@ -3,7 +3,7 @@ import Header from "../components/Home/Header";
 import Join from "../components/Home/Join";
 import Menu from "../components/Home/Menu";
 // import image from "../../assets/planner.png"
-import image from "../../assets/3d-casual-life-cubes-floating-in-the-air.png"
+import image from "../../assets/3d-glassy-levitating-multicolored-lenses.png"
 
 const HomePage = () => {
     const [isMenuVisible, setIsMenuVisible] = useState(false);
