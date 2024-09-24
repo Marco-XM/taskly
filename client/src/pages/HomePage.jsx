@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import Header from "../components/Home/Header";
 import Join from "../components/Home/Join";
 import Menu from "../components/Home/Menu";
-import image from "../../assets/planner.png"
+// import image from "../../assets/planner.png"
+import image from "../../assets/3d-casual-life-delivery-robot-1.png"
 
 const HomePage = () => {
     const [isMenuVisible, setIsMenuVisible] = useState(false);
