@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../components/Home/Header";
 import Join from "../components/Home/Join";
 import Menu from "../components/Home/Menu";
+import image from "../../assets/planner.png"
 
 const HomePage = () => {
     const [isMenuVisible, setIsMenuVisible] = useState(false);
