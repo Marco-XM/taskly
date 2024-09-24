@@ -78,7 +78,7 @@ const HomePage = () => {
                         <img src={image} alt="image" />
                     </div>
                     <div className="flex justify-center">
-                        {/* Illustration by <a href="https://icons8.com/illustrations/author/HxMFjfKZdNq2">Rosina Gavrilash</a> from <a href="https://icons8.com/illustrations">Ouch!</a> */}
+                        Illustration by <a href="https://icons8.com/illustrations/author/HxMFjfKZdNq2">Rosina Gavrilash</a> from <a href="https://icons8.com/illustrations">Ouch!</a>
                     </div>
                 </div>
             </div>
