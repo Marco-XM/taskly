@@ -68,7 +68,7 @@ const HomePage = () => {
             <div className="h-screen flex">
                 <div className="p-5 w-1/2 self-center font-bold text-2xl flex justify-center">
                     <div className="break-words flex flex-col justify-center">
-                        <h1 className="text-5xl font-bold mb-4">Welcome to Tasklyy!</h1>
+                        <h1 className="text-5xl font-bold mb-4">Welcome to Tasklyyy!</h1>
                         <p className="text-lg text-gray-400">
                             Stay organized and manage your tasks effortlessly.<br/> Start by creating your task boxes and adding tasks to them.
                         </p>
